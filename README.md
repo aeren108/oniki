@@ -2,6 +2,10 @@
 
 Oniki
 
+# Download
+
+[APK](https://www.dropbox.com/s/up20zf7n1sefta8/oniki-release.apk?dl=0) (Unsigned)
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
