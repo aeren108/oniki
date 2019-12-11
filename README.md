@@ -1,6 +1,6 @@
 # Oniki
 
-Oniki is a project I'm developing for fun. It provides you to rate everything.
+Oniki is an app I'm developing for fun. It's provides you to rate everything simply.
 
 # Download
 
