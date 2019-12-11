@@ -1,14 +1,15 @@
 class Item {
   String name;
+  String username;
   String rateType;
   int rate;
 
-  Item(this.name, this.rateType, this.rate);
+  Item(this.name, this.username, this.rateType, this.rate);
 
   static List<Item> items = [
-    Item("Dolap", "B", 12),
-    Item("Gofret", "B", 11),
-    Item("Halley", "B", 8),
-    Item("Dido", "B", 9)
+    Item("Dolap", "dolap.png", "B", 12),
+    Item("Gofret", "gfrt", "B", 11),
+    Item("Halley", "halley.tr", "B", 8),
+    Item("Dido", "lkrddo", "B", 9)
   ];
 }
