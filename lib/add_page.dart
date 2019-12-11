@@ -124,7 +124,6 @@ class _AddPageState extends State<AddPage> {
                                   onChanged: (value) {
                                     setState(() {
                                       item.rate = value.toInt();
-                                      print("Rate: $item.rate");
                                     });
                                   },
                               ),

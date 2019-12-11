@@ -8,7 +8,7 @@ class ItemList extends StatefulWidget {
 }
 
 class _ItemListState extends State<ItemList> {
-  static List<Item> items;
+  List<Item> items;
 
   @override
   void initState() {

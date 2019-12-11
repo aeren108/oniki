@@ -24,6 +24,17 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
+  Widget buildBody() {
+    // if item list is empty return a text which states item list is empty
+
+    if (Item.items.isEmpty) {
+      return Center(
+          child: Text("Puanlamak için + 'ya bas", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),)
+      );
+    } else
+      return ItemList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +47,7 @@ class _HomePageState extends State<HomePage> {
         },
         child: Icon(Icons.add)
       ),
-      body: ItemList()
+      body: buildBody()
     );
   }
 }
