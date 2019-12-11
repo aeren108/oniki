@@ -1,6 +1,10 @@
-# oniki
+# Oniki
 
-Oniki
+Oniki is a project I'm developing for fun. It provides you to rate everything.
+
+# Download
+
+[APK](https://www.dropbox.com/s/up20zf7n1sefta8/oniki-release.apk?dl=0) (Unsigned)
 
 ## Getting Started
 
