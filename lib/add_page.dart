@@ -2,22 +2,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'model/item.dart';
-import 'item_list.dart';
 
 class AddPage extends StatefulWidget {
+
+  Item _item = Item("", "", "N", 0);
+
+  AddPage.withItem(this._item);
+
+  AddPage();
+
   @override
-  _AddPageState createState() => _AddPageState();
+  _AddPageState createState() => _AddPageState(_item);
 }
 
 class _AddPageState extends State<AddPage> {
   final _formKey = GlobalKey<FormState>();
 
-  Item item = Item("İsim", "username", NORMAL, 0);
+  Item item = Item("", "", NORMAL, 0);
 
   static const String NORMAL = "N";
   static const String BACIM = "B";
   static const String AS = "A";
   String groupVal = NORMAL;
+
+  _AddPageState(this.item);
 
   handleRadio(String val) {
     setState(() {
@@ -36,6 +44,13 @@ class _AddPageState extends State<AddPage> {
           break;
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    groupVal = item.rateType;
   }
 
   @override
@@ -66,6 +81,7 @@ class _AddPageState extends State<AddPage> {
                           padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                           child: TextFormField(
                             decoration: InputDecoration(hintText: "İsmi ?"),
+                            initialValue: item.name,
                             validator: (String val) {
                               //TODO: Handle name validation
                             }, onSaved: (String val) {
@@ -92,6 +108,7 @@ class _AddPageState extends State<AddPage> {
                           padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                           child: TextFormField(
                             decoration: InputDecoration(hintText: "Insta usernamesi"),
+                            initialValue: item.username,
                             validator: (String val) {
                               //TODO: Handle username validation
                             }, onSaved: (String val) {
@@ -191,17 +208,44 @@ class _AddPageState extends State<AddPage> {
                       )
                     ],
                   ),
-                  RaisedButton(
-                    child: Text("Kaydet",),
-                    color: Theme.of(context).primaryColor,
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        _formKey.currentState.save();
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          child: Text("Kaydet",),
+                          color: Theme.of(context).primaryColor,
+                          onPressed: () {
+                            if (_formKey.currentState.validate()) {
+                              _formKey.currentState.save();
 
-                        Item.items.add(item);
-                        Navigator.pop(context);
-                      }
-                    },
+                              if (Item.items.contains(item))
+                                Item.items.remove(item);
+                              Item.items.insert(0, item);
+
+                              Navigator.pop(context);
+                            }
+                          },
+                        ),
+                      ), Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: RaisedButton(
+                          child: Text("Sil",),
+                          color: Theme.of(context).primaryColor,
+                          onPressed: () {
+                            if (_formKey.currentState.validate()) {
+
+                              _formKey.currentState.save();
+
+                              Item.items.remove(item);
+                              Navigator.pop(context);
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   )
                 ],
               )
