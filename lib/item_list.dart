@@ -3,20 +3,8 @@ import 'package:flutter/material.dart';
 import 'add_page.dart';
 import 'model/item.dart';
 
-class ItemList extends StatefulWidget {
-  @override
-  _ItemListState createState() => _ItemListState();
-}
-
-class _ItemListState extends State<ItemList> {
-  List<Item> _items;
-
-  @override
-  void initState() {
-    //TODO: Fetch items from database (sqlite)
-    super.initState();
-    _items = Item.items;
-  }
+class ItemList extends StatelessWidget {
+  final List<Item> _items = Item.items;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +15,7 @@ class _ItemListState extends State<ItemList> {
         return Column(
           children: <Widget>[
             ItemTile(item),
-            Divider(thickness: 1, indent: 8, endIndent: 8, color: Colors.black45,)
+            Divider(thickness: 1, indent: 10, endIndent: 10, color: Colors.black54)
           ],
         );
       });
@@ -35,7 +23,7 @@ class _ItemListState extends State<ItemList> {
 }
 
 class ItemTile extends StatelessWidget {
-  Item _item;
+  final Item _item;
 
   ItemTile(this._item);
 
@@ -43,7 +31,7 @@ class ItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(_item.name, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),),
-      subtitle: Text("${_item.username}", style: TextStyle(fontSize: 16, color: Colors.black87),),
+      subtitle: Text("insta: ${_item.username}", style: TextStyle(fontSize: 16, color: Colors.black87),),
       leading: FutureBuilder(
         future: _item.getPicURL(),
         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
@@ -57,14 +45,15 @@ class ItemTile extends StatelessWidget {
          return CircleAvatar(backgroundImage: NetworkImage(Item.PLACEHOLDER), radius: 28,);
         }
       ),
+      trailing: Text("${_item.rateType}  ${_item.rate}/12",
+        style: TextStyle(fontSize: 19, color: Colors.black54, fontWeight: FontWeight.bold, fontFamily: 'Duldolar' ),
+      ),
+
       onTap: () {
         Navigator.push(context, MaterialPageRoute(
             builder: (context) => AddPage.withItem(_item)
         ));
-      },
-      trailing: Text("${_item.rateType}  ${_item.rate}/12",
-        style: TextStyle(fontSize: 19, color: Colors.deepOrangeAccent, fontWeight: FontWeight.bold, fontFamily: 'Duldolar' ),
-      )
+      }
     );
   }
 }

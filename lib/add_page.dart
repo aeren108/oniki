@@ -222,6 +222,7 @@ class _AddPageState extends State<AddPage> {
 
                               if (Item.items.contains(item))
                                 Item.items.remove(item);
+
                               Item.items.insert(0, item);
 
                               Navigator.pop(context);
@@ -234,13 +235,8 @@ class _AddPageState extends State<AddPage> {
                           child: Icon(Icons.delete),
                           color: Theme.of(context).primaryColor,
                           onPressed: () {
-                            if (_formKey.currentState.validate()) {
-
-                              _formKey.currentState.save();
-
-                              Item.items.remove(item);
-                              Navigator.pop(context);
-                            }
+                            Item.items.remove(item);
+                            Navigator.pop(context);
                           },
                         ),
                       ),
