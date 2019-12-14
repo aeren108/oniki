@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'model/item.dart';
 
 class AddPage extends StatefulWidget {
-
-  Item _item = Item("", "", "N", 0);
+  Item _item;
 
   AddPage.withItem(this._item);
-
-  AddPage();
+  AddPage() {
+    _item = Item("", "", _AddPageState.NORMAL, 0);
+  }
 
   @override
   _AddPageState createState() => _AddPageState(_item);
@@ -20,9 +20,9 @@ class _AddPageState extends State<AddPage> {
 
   Item item = Item("", "", NORMAL, 0);
 
-  static const String NORMAL = "N";
-  static const String BACIM = "B";
-  static const String AS = "A";
+  static const String NORMAL = "";
+  static const String BACIM = "Bacim";
+  static const String AS = "As";
   String groupVal = NORMAL;
 
   _AddPageState(this.item);
@@ -49,7 +49,6 @@ class _AddPageState extends State<AddPage> {
   @override
   void initState() {
     super.initState();
-
     groupVal = item.rateType;
   }
 
@@ -112,7 +111,7 @@ class _AddPageState extends State<AddPage> {
                             validator: (String val) {
                               //TODO: Handle username validation
                             }, onSaved: (String val) {
-                            item.username = val;
+                            item.instaname = val;
                           },
                           ),
                         ),
@@ -215,7 +214,7 @@ class _AddPageState extends State<AddPage> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: RaisedButton(
-                          child: Text("Kaydet",),
+                          child: Icon(Icons.done),
                           color: Theme.of(context).primaryColor,
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
@@ -232,7 +231,7 @@ class _AddPageState extends State<AddPage> {
                       ), Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: RaisedButton(
-                          child: Text("Sil",),
+                          child: Icon(Icons.delete),
                           color: Theme.of(context).primaryColor,
                           onPressed: () {
                             if (_formKey.currentState.validate()) {

@@ -26,12 +26,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildBody() {
     // if item list is empty return a text which states item list is empty
-
-    if (Item.items.isEmpty) {
-      return Center(
-          child: Text("Puanlamak için + 'ya bas", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),)
-      );
-    } else
+    if (Item.items.isEmpty)
+      return Center(child: Text("Puanlamak için + 'ya bas", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),));
+     else
       return ItemList();
   }
 

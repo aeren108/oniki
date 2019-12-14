@@ -42,8 +42,8 @@ class ItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(_item.name, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 19),),
-      subtitle: Text("${_item.rateType} - ${_item.rate}/12", style: TextStyle(fontSize: 16, color: Colors.black87),),
+      title: Text(_item.name, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),),
+      subtitle: Text("${_item.username}", style: TextStyle(fontSize: 16, color: Colors.black87),),
       leading: FutureBuilder(
         future: _item.getPicURL(),
         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
@@ -54,24 +54,18 @@ class ItemTile extends StatelessWidget {
              radius: 28,
            );
          }
-         print("Selaamo");
-         print("${_item.username}");
-         return CircularProgressIndicator();
+         return CircleAvatar(backgroundImage: NetworkImage(Item.PLACEHOLDER), radius: 28,);
         }
       ),
-
       onTap: () {
         Navigator.push(context, MaterialPageRoute(
             builder: (context) => AddPage.withItem(_item)
         ));
       },
+      trailing: Text("${_item.rateType}  ${_item.rate}/12",
+        style: TextStyle(fontSize: 19, color: Colors.deepOrangeAccent, fontWeight: FontWeight.bold, fontFamily: 'Duldolar' ),
+      )
     );
   }
 }
-
-// child: CircleAvatar(
-//          //TODO: Display instagram profile pictures for each item (NetworkImage(item.url))
-//          backgroundImage: NetworkImage("https://avatars3.githubusercontent.com/u/27029242?s=460&v=4"),
-//          radius: 28,
-//        ),
 
