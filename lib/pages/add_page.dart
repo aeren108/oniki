@@ -1,15 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:oniki/data/database.dart';
 
-import 'model/item.dart';
+import '../model/item.dart';
 
 class AddPage extends StatefulWidget {
-  Item _item;
+  Item _item = Item("", "", _AddPageState.NORMAL, 0);
 
   AddPage.withItem(this._item);
-  AddPage() {
-    _item = Item("", "", _AddPageState.NORMAL, 0);
-  }
+  AddPage();
 
   @override
   _AddPageState createState() => _AddPageState(_item);
@@ -17,6 +16,7 @@ class AddPage extends StatefulWidget {
 
 class _AddPageState extends State<AddPage> {
   final _formKey = GlobalKey<FormState>();
+  final db = ItemDatabase();
 
   Item item = Item("", "", NORMAL, 0);
 
@@ -26,6 +26,12 @@ class _AddPageState extends State<AddPage> {
   String groupVal = NORMAL;
 
   _AddPageState(this.item);
+
+  @override
+  void initState() {
+    super.initState();
+    groupVal = item.rateType;
+  }
 
   handleRadio(String val) {
     setState(() {
@@ -44,12 +50,6 @@ class _AddPageState extends State<AddPage> {
           break;
       }
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    groupVal = item.rateType;
   }
 
   @override
@@ -220,10 +220,10 @@ class _AddPageState extends State<AddPage> {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
 
-                              if (Item.items.contains(item))
-                                Item.items.remove(item);
-
-                              Item.items.insert(0, item);
+                              if (item.id == null)
+                                db.createItem(item);
+                              else
+                                db.updateItem(item);
 
                               Navigator.pop(context);
                             }
@@ -235,7 +235,8 @@ class _AddPageState extends State<AddPage> {
                           child: Icon(Icons.delete),
                           color: Theme.of(context).primaryColor,
                           onPressed: () {
-                            Item.items.remove(item);
+                            if (item.id != null)
+                              db.deleteItem(item.id);
                             Navigator.pop(context);
                           },
                         ),

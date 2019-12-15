@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class Item {
+  int id;
   String name;
   String username;
   String rateType;
@@ -11,9 +12,15 @@ class Item {
   bool shouldUpdateUrl = true;
 
   static const String PLACEHOLDER = "https://assets.currencycloud.com/wp-content/uploads/2018/01/profile-placeholder.gif";
-  static List<Item> items = List();
 
   Item(this.name, this.username, this.rateType, this.rate);
+  Item.fromMap(Map<String, dynamic> map) {
+    id = map['id'];
+    name = map['name'];
+    username = map['insta'];
+    rate = map['rate'];
+    rateType = map['rate_type'];
+  }
 
   set instaname(String username) {
     if (this.username == username)
@@ -22,7 +29,7 @@ class Item {
     shouldUpdateUrl = true;
   }
 
-  Future<String> getPicURL() async {
+  Future<String> get instaPhoto async {
     if (shouldUpdateUrl) {
       final response = await http.get("https://www.instagram.com/web/search/topsearch/?query={$username}");
 
@@ -36,9 +43,19 @@ class Item {
         shouldUpdateUrl = false;
       } else {
         //An error occured return placeholder
-        return picUrl = PLACEHOLDER;
+        picUrl = PLACEHOLDER;
       }
     }
     return picUrl;
+  }
+
+  Map<String, dynamic> toMap(){
+    var map = Map<String, dynamic>();
+    map['id'] = id;
+    map['name'] = name;
+    map['insta'] = username;
+    map['rate'] = rate;
+    map['rate_type'] = rateType;
+    return map;
   }
 }
