@@ -21,22 +21,24 @@ class _ItemListState extends State<ItemList> {
       builder: (BuildContext context, AsyncSnapshot<List<Item>> snapshot) {
         if (snapshot.hasData) {
           _items = snapshot.data;
+
           if (_items.isEmpty)
-            return Center(child: Text("Tatata öldün çık", style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),));
+            return Center(child: Text("Puanlamak için 'Ekle'ye bas", style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold)));
+
           return ListView.builder(
-              itemCount: _items.length,
-              itemBuilder: (BuildContext context, int index) {
-                Item item = _items[index];
-                return Column(
-                  children: <Widget>[
-                    ItemTile(item),
-                    Divider(thickness: 1, indent: 10, endIndent: 10, color: Colors.black54)
-                  ],
-                );
-              });
-        } else {
-          return Center(child: CircularProgressIndicator());
+            itemCount: _items.length,
+            itemBuilder: (BuildContext context, int index) {
+              Item item = _items[index];
+              return Column(
+                children: <Widget>[
+                  ItemTile(item),
+                  Divider(thickness: 1, indent: 10, endIndent: 10, color: Colors.black54)
+                ],
+              );
+            }
+          );
         }
+        return Center(child: CircularProgressIndicator());
       }
     );
   }
@@ -64,6 +66,7 @@ class ItemTile extends StatelessWidget {
          return CircleAvatar(backgroundImage: NetworkImage(Item.PLACEHOLDER), radius: 28,);
         }
       ),
+
       trailing: Text("${_item.rateType}  ${_item.rate}/12",
         style: TextStyle(fontSize: 21, color: Color.fromARGB(255, 252, 66, 123), fontWeight: FontWeight.w500, fontFamily: 'Duldolar'),
       ),

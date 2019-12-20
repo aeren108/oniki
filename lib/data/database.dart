@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:oniki/model/item.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ItemDatabase {
@@ -44,7 +42,7 @@ class ItemDatabase {
 
   Future<List<Item>> fetchItems() async {
     var client = await db;
-    var res = await client.query('items');
+    var res = await client.query('items'); //returns List<Map<String, dynamic>>
 
     if (res.length > 0) {
       var items = res.map((item) => Item.fromMap(item)).toList();
