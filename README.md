@@ -2,7 +2,7 @@
 
 Oniki is an app I'm developing for fun. It's provides you to rate everything simply.
 
-# Download
+## Download
 
 [APK](https://www.dropbox.com/s/up20zf7n1sefta8/oniki-release.apk?dl=0) (Unsigned)
 
