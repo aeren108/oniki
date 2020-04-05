@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:oniki/pages/auth_form.dart';
 import 'package:oniki/services/auth_service.dart';
 
@@ -104,14 +105,40 @@ class RegisterPage extends AuthForm {
 
   @override
   void confirmAction(BuildContext context) {
+    _stateKey.currentState.setState(() => isLoading = true);
+
     _authService.registerWithEmail(email, password).then((user) {
       Navigator.pushReplacementNamed(context, '/home');
+      Scaffold.of(context).showSnackBar(
+          SnackBar(content: Text("Hoşgeldin ${user.displayName}")));
 
       _authService.currentUser.then((user) {
         UserUpdateInfo info = UserUpdateInfo();
         info.displayName = name;
-        user.updateProfile(info).then((arg) {user.reload();});
+        user.updateProfile(info).then((arg) {
+          user.reload();
+        });
       });
+    }).catchError((error) {
+      _stateKey.currentState.setState(() => isLoading = false);
+      String info;
+
+      switch (error.code) {
+        case 'ERROR_EMAIL_ALREADY_IN_USE':
+          info = 'E-Posta zaten kullanımda';
+          break;
+        case 'ERROR_INVALID_EMAIL':
+          info = 'Geçersiz E-Posta';
+          break;
+        case 'ERROR_WEAK_PASSWORD':
+          info = 'Şifre zayıf';
+          break;
+        default:
+          info = error.code;
+          break;
+      }
+
+      scaffold.currentState.showSnackBar(SnackBar(content: Text(info, style: TextStyle(fontSize: 16)), backgroundColor: Color(0xffC03D29)));
     });
   }
 }

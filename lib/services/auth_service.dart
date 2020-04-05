@@ -23,8 +23,10 @@ class AuthService {
     return (await _auth.createUserWithEmailAndPassword(email: email, password: password)).user;
   }
 
-  Future<FirebaseUser> signInWithGoogle() async {
-    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+  Future<GoogleSignInAccount> getGoogleAccount() async => await _googleSignIn.signIn();
+
+
+  Future<FirebaseUser> authenticateWithGoogle(GoogleSignInAccount googleUser) async{
     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
     final AuthCredential credential = GoogleAuthProvider.getCredential(
@@ -35,19 +37,12 @@ class AuthService {
     return (await _auth.signInWithCredential(credential)).user;
   }
 
-  void signOut() async {
+  Future<void> signOut() async {
     FirebaseUser user = await currentUser;
 
     if (user != null) {
-      switch (user.providerId) {
-        case EMAIL:
-          _auth.signOut();
-          break;
-        case GOOGLE:
-          _googleSignIn.signOut();
-          _auth.signOut();
-          break;
-      }
+      _auth.signOut();
+      _googleSignIn.signOut();
     }
   }
 }

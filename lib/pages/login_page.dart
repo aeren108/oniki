@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:oniki/pages/auth_form.dart';
 import 'package:oniki/services/auth_service.dart';
 
@@ -84,8 +86,44 @@ class LoginPage extends AuthForm {
 
   @override
   void confirmAction(BuildContext context) {
+    _stateKey.currentState.setState(() => isLoading = true);
+
     _authService.signInWithEmail(email, password).then((user) {
       Navigator.pushReplacementNamed(context, '/home');
+      Scaffold.of(context).showSnackBar(
+          SnackBar(content: Text("Hoşgeldin ${user.displayName}")));
+    }).catchError((error) {
+      _stateKey.currentState.setState(() => isLoading = false);
+      print("INFOOOO :: $error");
+      String info;
+
+      switch (error.code) {
+        case 'ERROR_INVALID_EMAIL':
+          info = 'Geçersiz E-Posta';
+          break;
+        case 'ERROR_WRONG_PASSWORD':
+          info = 'Yanlış şifre';
+          break;
+        case 'ERROR_USER_NOT_FOUND':
+          info = 'Bu E-Posta ile kayıtlı kullanıcı bulunamadı';
+          break;
+        case 'ERROR_USER_DISABLED':
+          info = 'Bu kullanıcı engellendi';
+          break;
+        case 'ERROR_TOO_MANY_REQUESTS':
+          info = 'Çok fazla istek';
+          break;
+        case 'ERROR_OPERATION_NOT_ALLOWED':
+          info = 'E-Posta ile giriş kullanımda değil';
+          break;
+        default:
+          info = error.code;
+          break;
+      }
+
+      scaffold.currentState.showSnackBar(SnackBar(content: Text(info, style: TextStyle(fontSize: 16)), backgroundColor: Color(0xffC03D29)));
+
     });
+
   }
 }

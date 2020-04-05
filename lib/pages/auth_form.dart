@@ -3,7 +3,10 @@ import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/ui/google_signin_button.dart';
 
 abstract class AuthForm extends StatefulWidget {
+  final scaffold = GlobalKey<ScaffoldState>();
+
   String confirmText;
+  bool isLoading = false;
 
   AuthForm(Key key) : super(key: key);
 
@@ -13,7 +16,6 @@ abstract class AuthForm extends StatefulWidget {
   List<Widget> buildForm(BuildContext context);
   List<Widget> buildFooter(BuildContext context);
   void confirmAction(BuildContext context);
-
 }
 
 class AuthFormState extends State<AuthForm> {
@@ -27,7 +29,10 @@ class AuthFormState extends State<AuthForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      key: widget.scaffold,
+      body: widget.isLoading ? Container(
+        child: Center(child: CircularProgressIndicator()),
+      ) : Container(
         height: double.infinity,
         child: SingleChildScrollView(
           physics: BouncingScrollPhysics(),
@@ -38,7 +43,8 @@ class AuthFormState extends State<AuthForm> {
                   style: TextStyle(
                       fontSize: 64,
                       fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
+                      //fontStyle: FontStyle.italic,
+                      fontFamily: "Bebas Neue",
                       foreground: Paint()..shader = linearGradient
                   )
               ),
@@ -115,10 +121,20 @@ class AuthFormState extends State<AuthForm> {
 
 
               GoogleSignInButton(onPressed: () {
-                _authService.signInWithGoogle().then((user) {
-                  print("User logged in: ${user.displayName}" );
-                  Navigator.pushReplacementNamed(context, '/home');
-                });
+
+                _authService.getGoogleAccount().then((googleUser) {
+                  if (googleUser == null)
+                    return;
+
+                  setState(() => widget.isLoading = true);
+
+                  _authService.authenticateWithGoogle(googleUser).then((user) {
+                    print("User logged in: ${user.displayName}" );
+                    Navigator.pushReplacementNamed(context, '/home');
+                    Scaffold.of(context).showSnackBar(SnackBar(content: Text("Hoşgeldin ${user.displayName}")));
+                  }).catchError(() => setState(() => widget.isLoading = false));
+
+                }).catchError(() => setState(() => widget.isLoading = false));
               }),
 
               SizedBox(height: 25),
