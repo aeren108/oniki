@@ -16,8 +16,8 @@ class HomePage extends StatelessWidget {
               ));
             },
             icon: Icon(Icons.add),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16.0))),
-            label: Text("Ekle", style: TextStyle(fontSize: 16),),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+            label: Text("Ekle", style: TextStyle(fontSize: 17)),
         ),
         body: ItemList()
     );

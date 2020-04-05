@@ -5,11 +5,15 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  static final AuthService _instance = AuthService._();
 
   static const String EMAIL = "password";
   static const String GOOGLE = "google.com";
 
   Future<FirebaseUser> get currentUser async { return _auth.currentUser();}
+  static AuthService get instance => _instance;
+
+  AuthService._();
 
   Future<FirebaseUser> signInWithEmail(String email, String password) async {
     return (await _auth.signInWithEmailAndPassword(email: email, password: password)).user;

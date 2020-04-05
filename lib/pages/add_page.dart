@@ -11,26 +11,27 @@ class AddPage extends StatefulWidget {
   AddPage();
 
   @override
-  _AddPageState createState() => _AddPageState(_item);
+  _AddPageState createState() => _AddPageState.withItem(_item);
 }
 
 class _AddPageState extends State<AddPage> {
   final _formKey = GlobalKey<FormState>();
   final db = ItemDatabase();
 
-  Item item = Item("", "", NORMAL, 0);
+  Item _item;
 
   static const String NORMAL = "";
   static const String BACIM = "Bacim";
   static const String AS = "As";
   String groupVal = NORMAL;
 
-  _AddPageState(this.item);
+  _AddPageState.withItem(this._item);
+  _AddPageState() { _item = Item("", "", NORMAL, 0); }
 
   @override
   void initState() {
     super.initState();
-    groupVal = item.rateType;
+    groupVal = _item.rateType;
   }
 
   handleRadio(String val) {
@@ -38,15 +39,15 @@ class _AddPageState extends State<AddPage> {
       switch (val) {
         case NORMAL:
           groupVal = NORMAL;
-          item.rateType = NORMAL;
+          _item.rateType = NORMAL;
           break;
         case BACIM:
           groupVal = BACIM;
-          item.rateType = BACIM;
+          _item.rateType = BACIM;
           break;
         case AS:
           groupVal = AS;
-          item.rateType = AS;
+          _item.rateType = AS;
           break;
       }
     });
@@ -80,11 +81,11 @@ class _AddPageState extends State<AddPage> {
                           padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                           child: TextFormField(
                             decoration: InputDecoration(hintText: "İsmi ?"),
-                            initialValue: item.name,
+                            initialValue: _item.name,
                             validator: (String val) {
                               //TODO: Handle name validation
                             }, onSaved: (String val) {
-                              item.name = val;
+                              _item.name = val;
                             },
                           ),
                         ),
@@ -107,12 +108,12 @@ class _AddPageState extends State<AddPage> {
                           padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                           child: TextFormField(
                             decoration: InputDecoration(hintText: "Insta usernamesi"),
-                            initialValue: item.username,
+                            initialValue: _item.username,
                             validator: (String val) {
                               //TODO: Handle username validation
                             },
                             onSaved: (String val) {
-                              item.instaname = val;
+                              _item.instaname = val;
                           },
                           ),
                         ),
@@ -125,7 +126,7 @@ class _AddPageState extends State<AddPage> {
                       child: Row(
                         children: <Widget>[
                           Text(
-                            "Sana puanım ${item.rate}",
+                            "Sana puanım ${_item.rate}",
                             style: TextStyle(
                               fontSize: 18
                             ),
@@ -134,13 +135,13 @@ class _AddPageState extends State<AddPage> {
                             child: Padding (
                               padding: const EdgeInsets.only(left: 3.0),
                               child: Slider(
-                                  value: item.rate.toDouble(),
+                                  value: _item.rate.toDouble(),
                                   min: 0.0,
                                   max: 12.0,
                                   divisions: 12,
                                   onChanged: (value) {
                                     setState(() {
-                                      item.rate = value.toInt();
+                                      _item.rate = value.toInt();
                                     });
                                   },
                               ),
@@ -221,10 +222,10 @@ class _AddPageState extends State<AddPage> {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
 
-                              if (item.id == null)
-                                db.createItem(item);
+                              if (_item.id == null)
+                                db.createItem(_item);
                               else
-                                db.updateItem(item);
+                                db.updateItem(_item);
 
                               Navigator.pop(context);
                             }
@@ -236,8 +237,8 @@ class _AddPageState extends State<AddPage> {
                           child: Icon(Icons.delete),
                           color: Theme.of(context).primaryColor,
                           onPressed: () {
-                            if (item.id != null)
-                              db.deleteItem(item.id);
+                            if (_item.id != null)
+                              db.deleteItem(_item.id);
                             Navigator.pop(context);
                           },
                         ),

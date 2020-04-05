@@ -5,13 +5,13 @@ import 'package:oniki/pages/login_page.dart';
 import 'package:oniki/pages/register_page.dart';
 
 import 'package:oniki/pages/home_page.dart';
-import 'package:oniki/services/auth.dart';
+import 'package:oniki/services/auth_service.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  AuthService _authService = AuthService();
+  AuthService _authService = AuthService.instance;
   FirebaseUser user = await _authService.currentUser;
 
   String initRoute = (user == null) ? '/register' : '/home';
