@@ -23,7 +23,7 @@ class _ItemListState extends State<ItemList> {
           _items = snapshot.data;
 
           if (_items.isEmpty)
-            return Center(child: Text("Puanlamak için 'Ekle'ye bas", style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold)));
+            return Center(child: Text("Puanlamak için 'Ekle'ye bas", style: TextStyle(fontSize: 32)));
 
           return ListView.builder(
             itemCount: _items.length,

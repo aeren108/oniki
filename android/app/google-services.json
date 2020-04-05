@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "303210361121",
+    "firebase_url": "https://oniki-app.firebaseio.com",
+    "project_id": "oniki-app",
+    "storage_bucket": "oniki-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:303210361121:android:aa3428aff778e71f6f4e60",
+        "android_client_info": {
+          "package_name": "aeren.oniki"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "303210361121-50uru6l73llvfto39gfgkflsr4sbbu2t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "aeren.oniki",
+            "certificate_hash": "a9df9e7bdc1233089515814dbd05b2d9e233fea3"
+          }
+        },
+        {
+          "client_id": "303210361121-2n7ibeht2mmli92ehm65v7gi2jof989f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8T7GrwXn2vPgXm6wHQro2_H1pRlPhPDs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "303210361121-2n7ibeht2mmli92ehm65v7gi2jof989f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

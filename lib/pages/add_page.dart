@@ -110,8 +110,9 @@ class _AddPageState extends State<AddPage> {
                             initialValue: item.username,
                             validator: (String val) {
                               //TODO: Handle username validation
-                            }, onSaved: (String val) {
-                            item.instaname = val;
+                            },
+                            onSaved: (String val) {
+                              item.instaname = val;
                           },
                           ),
                         ),
