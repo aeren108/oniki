@@ -44,20 +44,18 @@ class UserService {
     return posts;
   }
 
-  Future<void> createPost(User u, Post p) async {
-    CollectionReference userPostRef = postRef.document(u.id).collection('posts');
+  Future<void> createPost(Post p) async {
+    CollectionReference userPostRef = postRef.document(currentUser.id).collection('posts');
     DocumentReference doc = userPostRef.document();
     String id = doc.documentID;
     p.id = id;
 
-    await userPostRef.document(id).setData({
-      'id': id,
-      'name': p.name,
-      'rate': p.rate,
-      'type': p.type,
-      'url': p.mediaUrl,
-      'visibility': p.visibility
-    });
+    await userPostRef.document(id).setData(p.toMap());
+  }
+
+  Future<void> updatePost(Post p) async {
+    CollectionReference userPostRef = postRef.document(currentUser.id).collection('posts');
+    await userPostRef.document(p.id).setData(p.toMap());
   }
 
   Future<void> deletePost(User u, Post p) async {
@@ -66,6 +64,7 @@ class UserService {
     await userPostRef.delete();
   }
 
+  //Following system is suspended
   Future<void> followUser(User u, User f) async {
     await followingRef.document(u.id).collection('following').document(f.id).setData({
       'id': f.id

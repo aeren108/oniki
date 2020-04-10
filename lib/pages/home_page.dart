@@ -10,7 +10,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedPage = 0;
-  var _pages = <Widget>[Container(child: Text("Boş")), Container(child: Text("Boş")), ProfilePage()];
+  var _pages = <Widget>[Center(child: Text("Boş")), Center(child: Text("Boş")), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {

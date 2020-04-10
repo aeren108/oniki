@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.red
       ),
 
       initialRoute: initRoute,

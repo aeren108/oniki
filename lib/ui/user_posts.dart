@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/post.dart';
+import 'package:oniki/pages/add_page.dart';
 import 'package:oniki/services/user_service.dart';
 
 class UserPosts extends StatefulWidget {
@@ -8,42 +9,57 @@ class UserPosts extends StatefulWidget {
   _UserPostsState createState() => _UserPostsState();
 }
 
+
+
 class _UserPostsState extends State<UserPosts> {
   UserService _userService = UserService.instance;
   List<Post> _posts = [];
+  Future<List<Post>> _future;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _userService.getPosts(UserService.currentUser),
-      builder: (BuildContext context, AsyncSnapshot<List<Post>> snapshot) {
-        if (!snapshot.hasData)
-          return CircularProgressIndicator();
+    _future = _userService.getPosts(UserService.currentUser);
 
-        _posts = snapshot.data;
+    return RefreshIndicator(
 
-        if (_posts.isEmpty)
-          return Center(child: Padding(
-            padding: const EdgeInsets.only(top: 40),
-            child: Text('Burası bomboş ...', style: TextStyle(fontSize: 24)),
-          ));
+      onRefresh: _refresh,
+      child: FutureBuilder(
+        future: _future,
+        builder: (BuildContext context, AsyncSnapshot<List<Post>> snapshot) {
+          if (!snapshot.hasData)
+            return CircularProgressIndicator();
 
-        return ListView.builder(
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: _posts.length,
-          itemBuilder: (BuildContext context, int index) {
-            Post p = _posts[index];
-            return Column(
-              children: <Widget>[
-                PostTile(post: p),
-                Divider(thickness: 1.0, indent: 15, endIndent: 15, color: Colors.black54)
-              ],
-            );
-          }
-        );
-      },
+          _posts = snapshot.data;
+
+          if (_posts.isEmpty)
+            return Center(child: Padding(
+              padding: const EdgeInsets.only(top: 40),
+              child: Text('Burası bomboş ...', style: TextStyle(fontSize: 24)),
+            ));
+
+          return ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: _posts.length,
+            itemBuilder: (BuildContext context, int index) {
+              Post p = _posts[index];
+              return Column(
+                children: <Widget>[
+                  PostTile(post: p),
+                  Divider(thickness: 1.0, indent: 15, endIndent: 15, color: Colors.black54)
+                ],
+              );
+            }
+          );
+        },
+      ),
     );
   }
+
+  Future<void> _refresh() {
+    setState(() {});
+    return _future = _userService.getPosts(UserService.currentUser);
+  }
+
 }
 
 class PostTile extends StatelessWidget {
@@ -61,7 +77,7 @@ class PostTile extends StatelessWidget {
       ),
       trailing: Text("${post.rate.toInt()} / 12", style: TextStyle(fontSize: 21, fontFamily: 'Duldolar', color: watermelon),),
       onTap: () {
-        //TODO: Handle onTap()
+        Navigator.push(context, MaterialPageRoute(builder: (context) => AddPage.withPost(post)));
       },
     );
   }

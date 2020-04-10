@@ -9,17 +9,27 @@ import 'package:oniki/utils/post_utils.dart';
 
 class AddPage extends StatefulWidget {
   @override
-  _AddPageState createState() => _AddPageState();
+  _AddPageState createState() => _AddPageState(post);
+
+  Post post = Post();
+
+  AddPage.withPost(this.post);
+  AddPage();
 }
 
 class _AddPageState extends State<AddPage> {
   var _formKey = GlobalKey<FormState>();
   final _userService = UserService.instance;
 
-  Post _post = Post();
+  Post _post;
   String username;
 
   bool isLoading = false;
+  bool editMode = false;
+
+  _AddPageState(this._post) {
+    editMode = _post.id != null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +46,7 @@ class _AddPageState extends State<AddPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               TextFormField(
+                initialValue: _post.name,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: "İsim / Başlık",
@@ -54,6 +65,7 @@ class _AddPageState extends State<AddPage> {
               SizedBox(height: 10),
 
               TextFormField(
+                initialValue: _post.mediaData,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: "Insta",
@@ -77,7 +89,7 @@ class _AddPageState extends State<AddPage> {
                   Text("${_post.rate}", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                   SizedBox(width: 20),
                   RatingBar(
-                    initialRating: 0,
+                    initialRating: _post.rate / 2,
                     allowHalfRating: true,
                     glowRadius: 0.1,
                     glowColor: Colors.blueGrey,
@@ -129,9 +141,11 @@ class _AddPageState extends State<AddPage> {
                       _post.mediaData = data['username'];
                       _post.type = "NORMAL";
 
-                      _userService.createPost(UserService.currentUser, _post).then((arg) {
-                        Navigator.pop(context);
-                      });
+                      if (editMode)
+                        _userService.updatePost(_post).then((arg) => Navigator.pop(context));
+                      else
+                        _userService.createPost(_post).then((arg) => Navigator.pop(context));
+
                     });
                   }
                 },
