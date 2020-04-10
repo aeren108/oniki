@@ -124,10 +124,13 @@ class AuthFormState extends State<AuthForm> {
                           Navigator.pushReplacementNamed(context, '/home');
                         });
                       }
+                    }).catchError((error) {
+                      setState(() => widget.isLoading = false);
+                      print("${error.toString()} ---------SADKAKAAKA");
                     });
-                  }).catchError(() => setState(() => widget.isLoading = false));
+                  }).catchError((error) => setState(() => widget.isLoading = false));
 
-                }).catchError(() => setState(() => widget.isLoading = false));
+                }).catchError((error) => setState(() => widget.isLoading = false));
               }),
 
               SizedBox(height: 25),

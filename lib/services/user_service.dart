@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/post.dart';
 import 'package:oniki/model/user.dart';
-import 'package:oniki/services/auth_service.dart';
 
 class UserService {
   static final UserService _instance = UserService._();
@@ -25,8 +23,9 @@ class UserService {
 
   Future<User> findUser(String id) async {
     DocumentSnapshot snapshot = await userRef.document(id).get();
-    User u = User.fromMap(snapshot.data);
-    return u;
+    if (snapshot.data != null)
+      return User.fromMap(snapshot.data);
+    return null;
   }
 
   Future<void> updateUser(User u) async {
@@ -38,8 +37,10 @@ class UserService {
     QuerySnapshot query = await postRef.document(u.id).collection('posts').getDocuments();
 
     var posts = <Post>[];
-    for (DocumentSnapshot doc in query.documents)
-      posts.add(Post.fromMap(doc.data));
+    for (DocumentSnapshot doc in query.documents) {
+      if (doc != null)
+        posts.add(Post.fromMap(doc.data));
+    }
 
     return posts;
   }

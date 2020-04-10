@@ -11,13 +11,7 @@ class AuthService {
   Future<FirebaseUser> get currentUser async { return _auth.currentUser();}
   static AuthService get instance => _instance;
 
-  AuthService._() {
-    _auth.onAuthStateChanged.listen((user) {
-      UserService.instance.findUser(user.uid).then((user) {
-        UserService.currentUser = user;
-      });
-    });
-  }
+  AuthService._();
 
   Future<FirebaseUser> signInWithEmail(String email, String password) async {
     return (await _auth.signInWithEmailAndPassword(email: email, password: password)).user;

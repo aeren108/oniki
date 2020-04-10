@@ -23,11 +23,11 @@ class _HomePageState extends State<HomePage> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
-            title: Text('Feed', style: TextStyle())
+            title: Text('????', style: TextStyle())
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            title: Text("Gruplar", style: TextStyle())
+            icon: Icon(Icons.dashboard),
+            title: Text("????", style: TextStyle())
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
