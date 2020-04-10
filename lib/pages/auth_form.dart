@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:oniki/constants.dart';
+import 'package:oniki/model/user.dart';
 import 'package:oniki/services/auth_service.dart';
+import 'package:oniki/services/user_service.dart';
 import 'package:oniki/ui/google_signin_button.dart';
+import 'package:oniki/ui/gradient_button.dart';
 
 abstract class AuthForm extends StatefulWidget {
   final scaffold = GlobalKey<ScaffoldState>();
@@ -65,26 +69,8 @@ class AuthFormState extends State<AuthForm> {
                             for (Widget w in widget.buildForm(context)) w,
 
                             SizedBox(height: 15),
-
-                            RaisedButton(
-                              padding: const EdgeInsets.all(0.0),
-                              textColor: Colors.white,
-
-                              child: Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4.0),
-                                    gradient: LinearGradient(
-                                        colors:<Color>[
-                                          Color(0xfff7781e),
-                                          Color(0xffed154b)
-                                        ]
-                                    )
-                                ),
-                                padding: const EdgeInsets.all(10.0),
-                                child: Center(child: Text(widget.confirmText, style: TextStyle(fontSize: 22),)),
-                              ),
-
+                            GradientButton(
+                              child: Center(child: Text(widget.confirmText, style: TextStyle(fontSize: 22))),
                               onPressed: () {
                                 if (_formKey.currentState.validate()) {
                                   _formKey.currentState.save();
@@ -92,7 +78,8 @@ class AuthFormState extends State<AuthForm> {
                                   widget.confirmAction(context);
                                 }
                               },
-                            )
+                              colors: orangeRedGrad
+                            ),
                           ],
                         ),
                       ),
@@ -119,7 +106,6 @@ class AuthFormState extends State<AuthForm> {
 
               SizedBox(height: 30.0),
 
-
               GoogleSignInButton(onPressed: () {
 
                 _authService.getGoogleAccount().then((googleUser) {
@@ -129,9 +115,16 @@ class AuthFormState extends State<AuthForm> {
                   setState(() => widget.isLoading = true);
 
                   _authService.authenticateWithGoogle(googleUser).then((user) {
-                    print("User logged in: ${user.displayName}" );
-                    Navigator.pushReplacementNamed(context, '/home');
-                    Scaffold.of(context).showSnackBar(SnackBar(content: Text("Hoşgeldin ${user.displayName}")));
+                    UserService.instance.findUser(user.uid).then((usr) {
+                      if (usr != null) {
+                        UserService.currentUser = usr;
+                        Navigator.pushReplacementNamed(context, '/home');
+                      } else {
+                        UserService.instance.createUser(user.displayName, user.uid).then((arg) {
+                          Navigator.pushReplacementNamed(context, '/home');
+                        });
+                      }
+                    });
                   }).catchError(() => setState(() => widget.isLoading = false));
 
                 }).catchError(() => setState(() => widget.isLoading = false));

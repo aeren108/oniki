@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oniki/pages/auth_form.dart';
 import 'package:oniki/services/auth_service.dart';
+import 'package:oniki/services/user_service.dart';
 
 class LoginPage extends AuthForm {
   static final _stateKey = GlobalKey<AuthFormState>();
@@ -89,9 +89,11 @@ class LoginPage extends AuthForm {
     _stateKey.currentState.setState(() => isLoading = true);
 
     _authService.signInWithEmail(email, password).then((user) {
-      Navigator.pushReplacementNamed(context, '/home');
-      Scaffold.of(context).showSnackBar(
-          SnackBar(content: Text("Hoşgeldin ${user.displayName}")));
+        UserService.instance.findUser(user.uid).then((usr) {
+          UserService.currentUser = usr;
+
+          Navigator.pushReplacementNamed(context, '/home');
+        });
     }).catchError((error) {
       _stateKey.currentState.setState(() => isLoading = false);
       print("INFOOOO :: $error");
@@ -111,7 +113,7 @@ class LoginPage extends AuthForm {
           info = 'Bu kullanıcı engellendi';
           break;
         case 'ERROR_TOO_MANY_REQUESTS':
-          info = 'Çok fazla istek';
+          info = 'Bir şeyler ters gitti, birazdan tekrar deneyin';
           break;
         case 'ERROR_OPERATION_NOT_ALLOWED':
           info = 'E-Posta ile giriş kullanımda değil';

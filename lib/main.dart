@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:oniki/constants.dart';
 import 'package:oniki/pages/add_page.dart';
 import 'package:oniki/pages/login_page.dart';
 import 'package:oniki/pages/register_page.dart';
 
 import 'package:oniki/pages/home_page.dart';
+import 'package:oniki/pages/user_settings_page.dart';
 import 'package:oniki/services/auth_service.dart';
+import 'package:oniki/services/user_service.dart';
 
 
 void main() async {
@@ -13,8 +16,15 @@ void main() async {
 
   AuthService _authService = AuthService.instance;
   FirebaseUser user = await _authService.currentUser;
+  String initRoute;
+  if (user == null) {
+    initRoute = '/register';
+  } else {
+    UserService.currentUser = await UserService.instance.findUser(user.uid);
+    initRoute = '/home';
+  }
 
-  String initRoute = (user == null) ? '/register' : '/home';
+  initRoute = (user == null) ? '/register' : '/home';
   runApp(MyApp(initRoute));
 }
 
@@ -36,6 +46,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => RegisterPage(),
         '/login': (context) => LoginPage(),
         '/add': (context) => AddPage(),
+        '/user-settings': (context) => UserSettingsPage(),
         '/empty': (context) => Container()
       },
 

@@ -2,8 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:oniki/model/user.dart';
 import 'package:oniki/pages/auth_form.dart';
+import 'package:oniki/pages/home_page.dart';
 import 'package:oniki/services/auth_service.dart';
+import 'package:oniki/services/user_service.dart';
 
 class RegisterPage extends AuthForm {
   static final _stateKey = GlobalKey<AuthFormState>();
@@ -108,9 +111,11 @@ class RegisterPage extends AuthForm {
     _stateKey.currentState.setState(() => isLoading = true);
 
     _authService.registerWithEmail(email, password).then((user) {
+      UserService.instance.createUser(name, user.uid);
+      User u = User.newUser(name, user.uid);
+      UserService.currentUser = u;
+
       Navigator.pushReplacementNamed(context, '/home');
-      Scaffold.of(context).showSnackBar(
-          SnackBar(content: Text("Hoşgeldin ${user.displayName}")));
 
       _authService.currentUser.then((user) {
         UserUpdateInfo info = UserUpdateInfo();

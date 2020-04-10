@@ -1,19 +1,23 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:oniki/services/user_service.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   static final AuthService _instance = AuthService._();
 
-  static const String EMAIL = "password";
-  static const String GOOGLE = "google.com";
-
   Future<FirebaseUser> get currentUser async { return _auth.currentUser();}
   static AuthService get instance => _instance;
 
-  AuthService._();
+  AuthService._() {
+    _auth.onAuthStateChanged.listen((user) {
+      UserService.instance.findUser(user.uid).then((user) {
+        UserService.currentUser = user;
+      });
+    });
+  }
 
   Future<FirebaseUser> signInWithEmail(String email, String password) async {
     return (await _auth.signInWithEmailAndPassword(email: email, password: password)).user;
@@ -35,6 +39,12 @@ class AuthService {
     );
 
     return (await _auth.signInWithCredential(credential)).user;
+  }
+
+  Future<FirebaseUser> updateUser(UserUpdateInfo info) async {
+    FirebaseUser user = await currentUser;
+    await user.updateProfile(info);
+    return user;
   }
 
   Future<void> signOut() async {

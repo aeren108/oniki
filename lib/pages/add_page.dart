@@ -1,254 +1,144 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:oniki/data/database.dart';
-
-import '../model/item.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:oniki/constants.dart';
+import 'package:oniki/model/post.dart';
+import 'package:oniki/model/user.dart';
+import 'package:oniki/services/user_service.dart';
+import 'package:oniki/ui/gradient_button.dart';
+import 'package:oniki/utils/post_utils.dart';
 
 class AddPage extends StatefulWidget {
-  Item _item = Item("", "", _AddPageState.NORMAL, 0);
-
-  AddPage.withItem(this._item);
-  AddPage();
-
   @override
-  _AddPageState createState() => _AddPageState.withItem(_item);
+  _AddPageState createState() => _AddPageState();
 }
 
 class _AddPageState extends State<AddPage> {
-  final _formKey = GlobalKey<FormState>();
-  final db = ItemDatabase();
+  var _formKey = GlobalKey<FormState>();
+  final _userService = UserService.instance;
 
-  Item _item;
+  Post _post = Post();
+  String username;
 
-  static const String NORMAL = "";
-  static const String BACIM = "Bacim";
-  static const String AS = "As";
-  String groupVal = NORMAL;
-
-  _AddPageState.withItem(this._item);
-  _AddPageState() { _item = Item("", "", NORMAL, 0); }
-
-  @override
-  void initState() {
-    super.initState();
-    groupVal = _item.rateType;
-  }
-
-  handleRadio(String val) {
-    setState(() {
-      switch (val) {
-        case NORMAL:
-          groupVal = NORMAL;
-          _item.rateType = NORMAL;
-          break;
-        case BACIM:
-          groupVal = BACIM;
-          _item.rateType = BACIM;
-          break;
-        case AS:
-          groupVal = AS;
-          _item.rateType = AS;
-          break;
-      }
-    });
-  }
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Ekle")),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: <Widget>[
-            Form(
-              key: _formKey,
+      appBar: AppBar(
+        backgroundColor: watermelon,
+        title: Text("Puanla"),
+      ),
+      body: isLoading ? Center(child: CircularProgressIndicator()) : Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 45),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextFormField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "İsim / Başlık",
 
-              child: Column(
+                ),
+                validator: (name) {
+                  if (name.isEmpty)
+                    return "İsim boş olamaz";
+                  return null;
+                },
+                onSaved: (name) {
+                  _post.name = name;
+                },
+              ),
+
+              SizedBox(height: 10),
+
+              TextFormField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: "Insta",
+
+                ),
+                validator: (username) {
+                  if (username.isEmpty)
+                    return "Insta boş olamaz";
+                  return null;
+                },
+                onSaved: (username) {
+                  this.username = username;
+                },
+              ),
+
+              SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text (
-                          "İsim: ",
-                          style: TextStyle(
-                            fontSize: 18
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(hintText: "İsmi ?"),
-                            initialValue: _item.name,
-                            validator: (String val) {
-                              //TODO: Handle name validation
-                            }, onSaved: (String val) {
-                              _item.name = val;
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+                  Text("${_post.rate}", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                  SizedBox(width: 20),
+                  RatingBar(
+                    initialRating: 0,
+                    allowHalfRating: true,
+                    glowRadius: 0.1,
+                    glowColor: Colors.blueGrey,
+                    direction: Axis.horizontal,
+                    itemCount: 6,
+                    unratedColor: Color(0xb35c5c5c),
+                    itemBuilder: (context, _) => Icon(Icons.star, color: Colors.amber),
+                    onRatingUpdate: (rate) {
+                      setState(() {
+                        _post.rate = rate * 2;
+                      });
+                    },
                   ),
-                  Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text (
-                          "Insta: ",
-                          style: TextStyle(
-                              fontSize: 18
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(hintText: "Insta usernamesi"),
-                            initialValue: _item.username,
-                            validator: (String val) {
-                              //TODO: Handle username validation
-                            },
-                            onSaved: (String val) {
-                              _item.instaname = val;
-                          },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 12.0, bottom: 12.0, left: 10.0),
-                      child: Row(
-                        children: <Widget>[
-                          Text(
-                            "Sana puanım ${_item.rate}",
-                            style: TextStyle(
-                              fontSize: 18
-                            ),
-                          ),
-                          Expanded(
-                            child: Padding (
-                              padding: const EdgeInsets.only(left: 3.0),
-                              child: Slider(
-                                  value: _item.rate.toDouble(),
-                                  min: 0.0,
-                                  max: 12.0,
-                                  divisions: 12,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _item.rate = value.toInt();
-                                    });
-                                  },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              "Normal",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            Radio(
-                              value: NORMAL,
-                              groupValue: groupVal,
-                              activeColor: Colors.orange,
-                              onChanged: handleRadio,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              "Bacım",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            Radio(
-                              value: BACIM,
-                              groupValue: groupVal,
-                              activeColor: Colors.orange,
-                              onChanged: handleRadio,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              "As",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            Radio(
-                              value: AS,
-                              groupValue: groupVal,
-                              activeColor: Colors.orange,
-                              onChanged: handleRadio,
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: RaisedButton(
-                          child: Icon(Icons.done),
-                          color: Theme.of(context).primaryColor,
-                          onPressed: () {
-                            if (_formKey.currentState.validate()) {
-                              _formKey.currentState.save();
-
-                              if (_item.id == null)
-                                db.createItem(_item);
-                              else
-                                db.updateItem(_item);
-
-                              Navigator.pop(context);
-                            }
-                          },
-                        ),
-                      ), Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: RaisedButton(
-                          child: Icon(Icons.delete),
-                          color: Theme.of(context).primaryColor,
-                          onPressed: () {
-                            if (_item.id != null)
-                              db.deleteItem(_item.id);
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                    ],
-                  )
                 ],
-              )
-            ),
-          ]
+              ),
+
+              SizedBox(height: 10),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text("Gizli:", style: TextStyle(fontSize: 20)),
+                  Checkbox(
+                    activeColor: watermelon,
+                    value: !_post.visibility,
+                    onChanged: (value) {
+                      setState(() {
+                        _post.visibility = !value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 10),
+
+              GradientButton(
+                child: Center(child: Text("Yükle", style: TextStyle(fontSize: 22, color: Colors.white),)),
+                onPressed: ()  {
+                  if (_formKey.currentState.validate()) {
+                    _formKey.currentState.save();
+
+                    setState(() {
+                      isLoading = true;
+                    });
+
+                    getInstagramData(username).then((data) {
+                      _post.mediaUrl = data['url'];
+                      _post.mediaData = data['username'];
+                      _post.type = "NORMAL";
+
+                      _userService.createPost(UserService.currentUser, _post).then((arg) {
+                        Navigator.pop(context);
+                      });
+                    });
+                  }
+                },
+                colors: orangeRedGrad
+              ),
+            ],
+          ),
         ),
       ),
     );
