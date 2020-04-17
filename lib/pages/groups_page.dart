@@ -21,8 +21,8 @@ class _GroupsPageState extends State<GroupsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0.5,
-        title: Text("Gruplar", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        elevation: 0.0,
+        title: Text("Gruplar", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         centerTitle: true,
         flexibleSpace: appBarGradient,
       ),
@@ -255,7 +255,8 @@ class _JoinPageState extends State<JoinPage> {
                           onError();
                           return;
                         }
-
+                        setState(() { isLoading = false; });
+                        Navigator.pop(context);
                         onJoin();
 
                       });

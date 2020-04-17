@@ -30,6 +30,16 @@ class GroupService {
     return g;
   }
 
+  Future<void> deleteGroup(Group g) async {
+    List<User> members = await getGroupMembers(g);
+
+    for (var user in members) {
+      await userRef.document(user.id).collection("groups").document(g.id).delete();
+    }
+
+    await groupRef.document(g.id).delete();
+  }
+
   Future<List<Post>> getGroupPosts(Group g) async {
     QuerySnapshot query = await groupRef.document(g.id).collection("posts").getDocuments();
     return <Post>[ for (var doc in query.documents) Post.fromMap(doc.data) ];

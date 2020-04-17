@@ -74,14 +74,14 @@ class UserService {
   }
 
   Future<Group> joinGroup(String id) async {
-    DocumentSnapshot groupSnapshot = await groupRef.document(id).collection("members").document(currentUser.id).get();
-    DocumentSnapshot userSnapshot = await userRef.document(currentUser.id).collection("groups").document(id).get();
+    DocumentSnapshot groupSnapshot = await groupRef.document(id).get();
+    DocumentReference userDoc = userRef.document(currentUser.id).collection("groups").document(id);
 
-    if (groupSnapshot.data == null || userSnapshot == null)
+    if (groupSnapshot.data == null)
       return null;
 
-    await groupSnapshot.reference.setData({'id': currentUser.id});
-    await userSnapshot.reference.setData({'id': id});
+    await groupSnapshot.reference.collection("members").document(currentUser.id).setData({'id': currentUser.id});
+    await userDoc.setData({'id': id});
 
     return await GroupService.instance.findGroup(id);
   }

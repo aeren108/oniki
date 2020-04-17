@@ -124,7 +124,7 @@ class LoginPage extends AuthForm {
           break;
       }
 
-      scaffold.currentState.showSnackBar(SnackBar(content: Text(info, style: TextStyle(fontSize: 16)), backgroundColor: alertColor));
+      scaffold.currentState.showSnackBar(alertSnackBar(info));
 
     });
 

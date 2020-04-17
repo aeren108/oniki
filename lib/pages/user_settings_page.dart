@@ -26,6 +26,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
         title: Text("Kullanıcı Ayarları", style: TextStyle(fontSize: 20)),
         backgroundColor: watermelon,
         flexibleSpace: appBarGradient,
+        elevation: 0.0,
       ),
       body: isLoading ? Center(child: CircularProgressIndicator()) :
       Form(

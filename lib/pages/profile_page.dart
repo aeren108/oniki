@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
               expandedHeight: 190,
               pinned: true,
               backgroundColor: watermelon,
-              elevation: 0.5,
+              elevation: 0.0,
               centerTitle: true,
               actions: <Widget>[
                 IconButton(
@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 )
               ],
               flexibleSpace: FlexibleSpaceBar(
-                title: Text(UserService.currentUser.name, style: TextStyle(fontSize: 22)),
+                title: Text(UserService.currentUser.name, style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
                 centerTitle: true,
                 collapseMode: CollapseMode.pin,
                 background: Container(
@@ -50,14 +50,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     )
                   ),
 
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      CircleAvatar(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: CircleAvatar(
                         backgroundImage: NetworkImage(UserService.currentUser.photo),
-                        radius: 42,
+                        radius: 45,
                       ),
-                    ],
+                    ),
                   )
                 ),
               ),
@@ -73,7 +74,7 @@ class _ProfilePageState extends State<ProfilePage> {
     showModalBottomSheet(
       context: c,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(12.0), topRight: Radius.circular(12.0))
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0))
       ),
       backgroundColor: Colors.white,
       builder: (BuildContext context) {
