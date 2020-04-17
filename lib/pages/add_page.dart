@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/post.dart';
-import 'package:oniki/model/user.dart';
 import 'package:oniki/services/user_service.dart';
-import 'package:oniki/ui/gradient_button.dart';
+import 'package:oniki/widgets/gradient_button.dart';
 import 'package:oniki/utils/post_utils.dart';
 
 class AddPage extends StatefulWidget {
@@ -36,7 +35,8 @@ class _AddPageState extends State<AddPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: watermelon,
-        title: Text("Puanla"),
+        flexibleSpace: appBarGradient,
+        title: Text("Puanla", style: TextStyle(fontSize: 22)),
       ),
       body: isLoading ? Center(child: CircularProgressIndicator()) : Form(
         key: _formKey,
@@ -86,7 +86,7 @@ class _AddPageState extends State<AddPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text("${_post.rate}", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                  Text("${_post.rate.round()}", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                   SizedBox(width: 20),
                   RatingBar(
                     initialRating: _post.rate / 2,
@@ -149,7 +149,7 @@ class _AddPageState extends State<AddPage> {
                     });
                   }
                 },
-                colors: orangeRedGrad
+                colors: pinkBurgundyGrad
               ),
             ],
           ),

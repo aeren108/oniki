@@ -4,7 +4,7 @@ import 'package:oniki/constants.dart';
 import 'package:oniki/model/user.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
-import 'package:oniki/ui/gradient_button.dart';
+import 'package:oniki/widgets/gradient_button.dart';
 
 class UserSettingsPage extends StatefulWidget {
   @override
@@ -23,19 +23,20 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Kullanıcı Ayarları"),
+        title: Text("Kullanıcı Ayarları", style: TextStyle(fontSize: 20)),
         backgroundColor: watermelon,
+        flexibleSpace: appBarGradient,
       ),
       body: isLoading ? Center(child: CircularProgressIndicator()) :
       Form(
         key: _formKey,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 45.0, vertical: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 45.0, vertical: 36.0),
           child: Column(
             children: <Widget>[
               CircleAvatar(backgroundImage: NetworkImage(UserService.currentUser.photo), radius: 40),
 
-              SizedBox(height: 15.0),
+              SizedBox(height: 20.0),
 
               TextFormField(
                 decoration: InputDecoration(
@@ -73,7 +74,7 @@ class _UserSettingsPageState extends State<UserSettingsPage> {
                     });
                   }
                 },
-                colors: orangeRedGrad
+                colors: pinkBurgundyGrad
               )
             ],
           ),

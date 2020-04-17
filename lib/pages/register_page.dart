@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:oniki/constants.dart';
 import 'package:oniki/model/user.dart';
 import 'package:oniki/pages/auth_form.dart';
 import 'package:oniki/pages/home_page.dart';
@@ -143,7 +144,7 @@ class RegisterPage extends AuthForm {
           break;
       }
 
-      scaffold.currentState.showSnackBar(SnackBar(content: Text(info, style: TextStyle(fontSize: 16)), backgroundColor: Color(0xffC03D29)));
+      scaffold.currentState.showSnackBar(SnackBar(content: Text(info, style: TextStyle(fontSize: 16)), backgroundColor: alertColor));
     });
   }
 }

@@ -22,10 +22,13 @@ void main() async {
   } else {
     print(user.uid);
     UserService.currentUser = await UserService.instance.findUser(user.uid);
-    initRoute = '/home';
+    if (UserService.currentUser != null)
+      initRoute = '/home';
+    else
+      initRoute = '/register';
   }
 
-  initRoute = (user == null) ? '/register' : '/home';
+  initRoute = (UserService.currentUser == null) ? '/register' : '/home';
   runApp(MyApp(initRoute));
 }
 
@@ -38,7 +41,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.red
+        primarySwatch: Colors.pink
       ),
 
       initialRoute: initRoute,
@@ -50,7 +53,6 @@ class MyApp extends StatelessWidget {
         '/user-settings': (context) => UserSettingsPage(),
         '/empty': (context) => Container()
       },
-
     );
   }
 }

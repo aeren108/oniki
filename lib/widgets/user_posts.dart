@@ -9,8 +9,6 @@ class UserPosts extends StatefulWidget {
   _UserPostsState createState() => _UserPostsState();
 }
 
-
-
 class _UserPostsState extends State<UserPosts> {
   UserService _userService = UserService.instance;
   List<Post> _posts = [];
@@ -18,7 +16,7 @@ class _UserPostsState extends State<UserPosts> {
 
   @override
   Widget build(BuildContext context) {
-    _future = _userService.getPosts(UserService.currentUser);
+    _future = _userService.getPosts();
 
     return RefreshIndicator(
 
@@ -45,7 +43,7 @@ class _UserPostsState extends State<UserPosts> {
               return Column(
                 children: <Widget>[
                   PostTile(post: p),
-                  Divider(thickness: 1.0, indent: 15, endIndent: 15, color: Colors.black54)
+                  Divider(thickness: 1.0, indent: 15, endIndent: 15)
                 ],
               );
             }
@@ -57,7 +55,7 @@ class _UserPostsState extends State<UserPosts> {
 
   Future<void> _refresh() {
     setState(() {});
-    return _future = _userService.getPosts(UserService.currentUser);
+    return _future = _userService.getPosts();
   }
 
 }
@@ -65,12 +63,13 @@ class _UserPostsState extends State<UserPosts> {
 class PostTile extends StatelessWidget {
   Post post;
 
-  PostTile({@required this.post });
+  PostTile({@required this.post});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(post.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      subtitle: Text(post.mediaData, style: TextStyle(fontSize: 15)),
       leading: CircleAvatar(
         backgroundImage: NetworkImage(post.mediaUrl),
         radius: 24,

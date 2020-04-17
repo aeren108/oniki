@@ -1,7 +1,6 @@
 class User {
   String name, id;
   String photo = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
-  int following = 0, followers = 0;
 
   User._();
 
@@ -11,8 +10,6 @@ class User {
     id = map['id'];
     name = map['name'];
     photo = map['photo'];
-    following = map['following'];
-    followers = map['followers'];
   }
 
   Map<String, dynamic> toMap() {
@@ -20,8 +17,6 @@ class User {
       'id': id,
       'name': name,
       'photo': photo,
-      'following': following,
-      'followers': followers
     };
   }
 }

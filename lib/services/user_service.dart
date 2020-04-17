@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:oniki/constants.dart';
+import 'package:oniki/model/group.dart';
 import 'package:oniki/model/post.dart';
 import 'package:oniki/model/user.dart';
+import 'package:oniki/services/group_service.dart';
 
 class UserService {
   static final UserService _instance = UserService._();
@@ -10,15 +12,16 @@ class UserService {
   static User _currentUser = null;
 
   static User get currentUser  => _currentUser;
-
   static set currentUser(User u) => _currentUser = u;
 
   UserService._();
 
-  Future<void> createUser(String name, String id) async {
+  Future<User> createUser(String name, String id) async {
     DocumentReference doc = userRef.document(id);
     User u = User.newUser(name, id);
     await doc.setData(u.toMap());
+
+    return u;
   }
 
   Future<User> findUser(String id) async {
@@ -33,8 +36,8 @@ class UserService {
     await doc.setData(u.toMap());
   }
 
-  Future<List<Post>> getPosts(User u) async {
-    QuerySnapshot query = await postRef.document(u.id).collection('posts').getDocuments();
+  Future<List<Post>> getPosts() async {
+    QuerySnapshot query = await postRef.document(currentUser.id).collection('posts').getDocuments();
 
     var posts = <Post>[];
     for (DocumentSnapshot doc in query.documents) {
@@ -59,29 +62,33 @@ class UserService {
     await userPostRef.document(p.id).setData(p.toMap());
   }
 
-  Future<void> deletePost(User u, Post p) async {
-    DocumentReference userPostRef = postRef.document(u.id).collection('posts').document(p.id);
+  Future<void> deletePost(Post p) async {
+    DocumentReference userPostRef = postRef.document(currentUser.id).collection('posts').document(p.id);
 
     await userPostRef.delete();
   }
 
-  //Following system is suspended
-  Future<void> followUser(User u, User f) async {
-    await followingRef.document(u.id).collection('following').document(f.id).setData({
-      'id': f.id
-    });
-
-    await followerRef.document(f.id).collection('followers').document(u.id).setData({
-      'id': u.id
-    });
-
-    //TODO: Handle follower and following count update
+  Future<List<Group>> getGroups() async {
+    QuerySnapshot query = await userRef.document(currentUser.id).collection("groups").getDocuments();
+    return <Group>[ for (var doc in query.documents) await GroupService.instance.findGroup(doc.documentID) ];
   }
 
-  Future<void> unfollowUser(User u, User f) async {
-    await followingRef.document(u.id).collection('following').document(f.id).delete();
-    await followerRef.document(f.id).collection('followers').document(u.id).delete();
+  Future<Group> joinGroup(String id) async {
+    DocumentSnapshot groupSnapshot = await groupRef.document(id).collection("members").document(currentUser.id).get();
+    DocumentSnapshot userSnapshot = await userRef.document(currentUser.id).collection("groups").document(id).get();
 
-    //TODO: Handle follower and following count update
+    if (groupSnapshot.data == null || userSnapshot == null)
+      return null;
+
+    await groupSnapshot.reference.setData({'id': currentUser.id});
+    await userSnapshot.reference.setData({'id': id});
+
+    return await GroupService.instance.findGroup(id);
   }
+
+  Future<void> leaveGroup(String id) async {
+    await groupRef.document(id).delete();
+    await userRef.document(currentUser.id).collection("groups").document(id).delete();
+  }
+
 }

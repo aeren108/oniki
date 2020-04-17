@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:oniki/constants.dart';
 import 'package:oniki/pages/auth_form.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
@@ -123,7 +124,7 @@ class LoginPage extends AuthForm {
           break;
       }
 
-      scaffold.currentState.showSnackBar(SnackBar(content: Text(info, style: TextStyle(fontSize: 16)), backgroundColor: Color(0xffC03D29)));
+      scaffold.currentState.showSnackBar(SnackBar(content: Text(info, style: TextStyle(fontSize: 16)), backgroundColor: alertColor));
 
     });
 

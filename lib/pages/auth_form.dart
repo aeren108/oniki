@@ -3,8 +3,8 @@ import 'package:oniki/constants.dart';
 import 'package:oniki/model/user.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
-import 'package:oniki/ui/google_signin_button.dart';
-import 'package:oniki/ui/gradient_button.dart';
+import 'package:oniki/widgets/google_signin_button.dart';
+import 'package:oniki/widgets/gradient_button.dart';
 
 abstract class AuthForm extends StatefulWidget {
   final scaffold = GlobalKey<ScaffoldState>();
@@ -75,10 +75,11 @@ class AuthFormState extends State<AuthForm> {
                                 if (_formKey.currentState.validate()) {
                                   _formKey.currentState.save();
 
+                                  _authService.signOut();
                                   widget.confirmAction(context);
                                 }
                               },
-                              colors: orangeRedGrad
+                              colors: pinkBurgundyGrad
                             ),
                           ],
                         ),
@@ -120,7 +121,8 @@ class AuthFormState extends State<AuthForm> {
                         UserService.currentUser = usr;
                         Navigator.pushReplacementNamed(context, '/home');
                       } else {
-                        UserService.instance.createUser(user.displayName, user.uid).then((arg) {
+                        UserService.instance.createUser(user.displayName, user.uid).then((usr0) {
+                          UserService.currentUser = usr0;
                           Navigator.pushReplacementNamed(context, '/home');
                         });
                       }
