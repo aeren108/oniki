@@ -16,9 +16,13 @@ class UserService {
 
   UserService._();
 
-  Future<User> createUser(String name, String id) async {
+  Future<User> createUser(String name, String id, [String photoUrl]) async {
     DocumentReference doc = userRef.document(id);
     User u = User.newUser(name, id);
+
+    if (photoUrl != null)
+      u.photo = photoUrl;
+
     await doc.setData(u.toMap());
 
     return u;
@@ -36,8 +40,8 @@ class UserService {
     await doc.setData(u.toMap());
   }
 
-  Future<List<Post>> getPosts() async {
-    QuerySnapshot query = await postRef.document(currentUser.id).collection('posts').getDocuments();
+  Future<List<Post>> getPosts(User u) async {
+    QuerySnapshot query = await postRef.document(u.id).collection('posts').getDocuments();
 
     var posts = <Post>[];
     for (DocumentSnapshot doc in query.documents) {
@@ -86,9 +90,9 @@ class UserService {
     return await GroupService.instance.findGroup(id);
   }
 
-  Future<void> leaveGroup(String id) async {
-    await groupRef.document(id).delete();
-    await userRef.document(currentUser.id).collection("groups").document(id).delete();
+  Future<void> leaveGroup(Group g) async {
+    await groupRef.document(g.id).collection("members").document(currentUser.id).delete();
+    await userRef.document(currentUser.id).collection("groups").document(g.id).delete();
   }
 
 }

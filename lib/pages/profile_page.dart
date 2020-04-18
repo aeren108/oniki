@@ -1,26 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
+import 'package:oniki/model/user.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
 import 'package:oniki/widgets/user_posts.dart';
 
 class ProfilePage extends StatefulWidget {
+
+  User user = UserService.currentUser;
+
+  ProfilePage();
+  ProfilePage.withUser({ @required this.user });
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  List<Widget> actionWidgets = [];
+  bool isCurrentUser;
 
   @override
   void initState() {
+    isCurrentUser = widget.user.id == UserService.currentUser.id;
+
+    if (isCurrentUser)
+      actionWidgets = <Widget>[IconButton(icon: Icon(Icons.menu), onPressed: () {_showBottomSheet(context);})];
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: () => Navigator.pushNamed(context, '/add'), child: Icon(Icons.add, size: 36, color: Colors.white), backgroundColor: Colors.black54,),
-      body: (UserService.currentUser == null) ? Center(child: CircularProgressIndicator()) :
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamed(context, '/add'),
+        child: Icon(Icons.add, size: 36, color: Colors.white),
+        backgroundColor: Colors.black54,),
+      body: (widget.user == null) ? Center(child: CircularProgressIndicator()) :
         NestedScrollView(
           headerSliverBuilder:(context, innerBoxIsScrolled) => <Widget>[
             SliverAppBar(
@@ -29,16 +46,9 @@ class _ProfilePageState extends State<ProfilePage> {
               backgroundColor: watermelon,
               elevation: 0.0,
               centerTitle: true,
-              actions: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.menu),
-                  onPressed: () {
-                    _showBottomSheet(context);
-                  },
-                )
-              ],
+              actions: actionWidgets,
               flexibleSpace: FlexibleSpaceBar(
-                title: Text(UserService.currentUser.name, style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
+                title: Text(widget.user.name, style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700)),
                 centerTitle: true,
                 collapseMode: CollapseMode.pin,
                 background: Container(
@@ -55,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Align(
                       alignment: Alignment.center,
                       child: CircleAvatar(
-                        backgroundImage: NetworkImage(UserService.currentUser.photo),
+                        backgroundImage: NetworkImage(widget.user.photo),
                         radius: 45,
                       ),
                     ),
@@ -65,7 +75,10 @@ class _ProfilePageState extends State<ProfilePage> {
             )
           ],
 
-          body: UserPosts(),
+          body: IgnorePointer(
+            ignoring: !isCurrentUser,
+            child: UserPosts(user: widget.user, isPrivate: !isCurrentUser)
+          ),
         ),
     );
   }

@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/post.dart';
+import 'package:oniki/model/user.dart';
 import 'package:oniki/pages/add_page.dart';
 import 'package:oniki/services/user_service.dart';
 
 class UserPosts extends StatefulWidget {
+  User user;
+  bool isPrivate = false;
+
+  UserPosts({ @required this.user, this.isPrivate});
+
   @override
   _UserPostsState createState() => _UserPostsState();
 }
 
 class _UserPostsState extends State<UserPosts> {
-  UserService _userService = UserService.instance;
+  final UserService _userService = UserService.instance;
+
   List<Post> _posts = [];
   Future<List<Post>> _future;
 
   @override
   Widget build(BuildContext context) {
-    _future = _userService.getPosts();
+    _future = _userService.getPosts(widget.user);
 
     return RefreshIndicator(
 
@@ -25,15 +32,26 @@ class _UserPostsState extends State<UserPosts> {
         future: _future,
         builder: (BuildContext context, AsyncSnapshot<List<Post>> snapshot) {
           if (!snapshot.hasData)
-            return CircularProgressIndicator();
+            return Center(child: CircularProgressIndicator());
 
           _posts = snapshot.data;
 
           if (_posts.isEmpty)
             return Center(child: Padding(
               padding: const EdgeInsets.only(top: 40),
-              child: Text('Burası bomboş ...', style: TextStyle(fontSize: 24)),
+              child: Text("Puanlamak için '+'ya bas", style: TextStyle(fontSize: 24)),
             ));
+
+          if (widget.isPrivate) {
+            for (int i = 0; i < _posts.length; i++) {
+              Post p = _posts[i];
+
+              if (!p.visibility) {
+                _posts.remove(p);
+                i--;
+              }
+            }
+          }
 
           return ListView.builder(
             physics: NeverScrollableScrollPhysics(),
@@ -42,7 +60,25 @@ class _UserPostsState extends State<UserPosts> {
               Post p = _posts[index];
               return Column(
                 children: <Widget>[
-                  PostTile(post: p),
+                  Dismissible(
+                    key: Key(p.id),
+                    background: Container(
+                      color: Colors.red,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 24.0),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Icon(Icons.delete_forever, color: Colors.white, size: 38)
+                        ),
+                      ),
+                    ),
+                    direction: DismissDirection.endToStart,
+                    child: PostTile(post: p),
+                    onDismissed: (direction) {
+                      _userService.deletePost(p);
+                      setState(() { _posts.remove(p); });
+                    },
+                  ),
                   Divider(thickness: 1.0, indent: 15, endIndent: 15)
                 ],
               );
@@ -55,7 +91,7 @@ class _UserPostsState extends State<UserPosts> {
 
   Future<void> _refresh() {
     setState(() {});
-    return _future = _userService.getPosts();
+    return _future = _userService.getPosts(widget.user);
   }
 
 }
@@ -76,7 +112,7 @@ class PostTile extends StatelessWidget {
       ),
       trailing: Text("${post.rate.toInt()} / 12", style: TextStyle(fontSize: 21, fontFamily: 'Duldolar', color: watermelon),),
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => AddPage.withPost(post)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => AddPage.withPost(post, null)));
       },
     );
   }

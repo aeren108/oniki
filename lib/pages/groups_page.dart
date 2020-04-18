@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/group.dart';
@@ -15,10 +16,13 @@ class _GroupsPageState extends State<GroupsPage> {
   final _userService = UserService.instance;
   final _groupService = GroupService.instance;
 
+  Future<List<Group>> _future;
   List<Group> _groups = [];
 
   @override
   Widget build(BuildContext context) {
+    _future = _userService.getGroups();
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -27,65 +31,72 @@ class _GroupsPageState extends State<GroupsPage> {
         flexibleSpace: appBarGradient,
       ),
 
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
+      body: RefreshIndicator(
+        onRefresh: () {
+          setState(() {});
+          return _future = _userService.getGroups();
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            //Groups list
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: FutureBuilder(
+                future: _future,
+                builder: (context, snapshot) {
+                  if ((snapshot.connectionState != ConnectionState.done || !snapshot.hasData) && _groups.isEmpty)
+                    return Center(child: CircularProgressIndicator());
 
-          //Groups list
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: FutureBuilder(
-              future: _userService.getGroups(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.done || !snapshot.hasData)
-                  return Center(child: CircularProgressIndicator());
+                  _groups = snapshot.data;
 
-                _groups = snapshot.data;
+                  if (_groups.isEmpty)
+                    return Center(child: Text("Katıldığın hiçbir grup yok.", style: TextStyle(fontSize: 24)));
 
-                if (_groups.isEmpty)
-                  return Center(child: Text("Katıldığın hiçbir grup yok.", style: TextStyle(fontSize: 24)));
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                    child: SizedBox(
+                      height: 400,
+                      child: ListView.builder(
+                        itemCount: _groups.length,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: <Widget>[
+                              GroupTile(group: _groups[index]),
+                              Divider(thickness: 1, indent: 12.0, endIndent: 12.0)
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _groups.length,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: <Widget>[
-                          GroupTile(group: _groups[index]),
-                          Divider(thickness: 1, indent: 12.0, endIndent: 12.0)
-                        ],
-                      );
-                    },
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Column(
+                children: <Widget>[
+                  ListTile(
+                    title: Text("Bir gruba katıl", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: watermelon)),
+                    leading: Icon(Icons.group_add, size: 36, color: Colors.black54),
+                    onTap: () { _showJoinGroupBottomSheet(context); },
                   ),
-                );
-              },
+
+                  Divider(thickness: 1, indent: 20, endIndent: 20),
+
+                  ListTile(
+                    title: Text("Bir grup oluştur", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: watermelon)),
+                    leading: Icon(Icons.add, size: 36, color: Colors.black54),
+                    onTap: () { _showCreateGroupBottomSheet(context); }
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Column(
-              children: <Widget>[
-                ListTile(
-                  title: Text("Bir gruba katıl", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: watermelon)),
-                  leading: Icon(Icons.group_add, size: 36, color: Colors.black54),
-                  onTap: () { _showJoinGroupBottomSheet(context); },
-                ),
-
-                Divider(thickness: 1, indent: 20, endIndent: 20),
-
-                ListTile(
-                  title: Text("Bir grup oluştur", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: watermelon)),
-                  leading: Icon(Icons.add, size: 36, color: Colors.black54),
-                  onTap: () { _showCreateGroupBottomSheet(context); }
-                ),
-              ],
-            ),
-          ),
-
-        ],
+          ],
+        ),
       )
     );
   }

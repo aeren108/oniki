@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/user.dart';
 import 'package:oniki/services/auth_service.dart';
@@ -121,14 +122,14 @@ class AuthFormState extends State<AuthForm> {
                         UserService.currentUser = usr;
                         Navigator.pushReplacementNamed(context, '/home');
                       } else {
-                        UserService.instance.createUser(user.displayName, user.uid).then((usr0) {
+                        UserService.instance.createUser(user.displayName, user.uid, user.photoUrl).then((usr0) {
+
                           UserService.currentUser = usr0;
                           Navigator.pushReplacementNamed(context, '/home');
                         });
                       }
                     }).catchError((error) {
                       setState(() => widget.isLoading = false);
-                      print("${error.toString()} ---------SADKAKAAKA");
                     });
                   }).catchError((error) => setState(() => widget.isLoading = false));
 

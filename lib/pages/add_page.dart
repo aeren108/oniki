@@ -1,33 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+
 import 'package:oniki/constants.dart';
+import 'package:oniki/model/group.dart';
 import 'package:oniki/model/post.dart';
+import 'package:oniki/services/group_service.dart';
 import 'package:oniki/services/user_service.dart';
 import 'package:oniki/widgets/gradient_button.dart';
 import 'package:oniki/utils/post_utils.dart';
 
 class AddPage extends StatefulWidget {
   @override
-  _AddPageState createState() => _AddPageState(post);
+  _AddPageState createState() => _AddPageState(post, group);
 
   Post post = Post();
+  Group group;
 
-  AddPage.withPost(this.post);
-  AddPage();
+  AddPage.withPost(this.post, this.group);
+  AddPage(this.group);
 }
 
 class _AddPageState extends State<AddPage> {
   var _formKey = GlobalKey<FormState>();
   final _userService = UserService.instance;
+  final _groupService = GroupService.instance;
 
   Post _post;
+  Group _group;
   String username;
 
   bool isLoading = false;
   bool editMode = false;
+  bool groupMode;
 
-  _AddPageState(this._post) {
+  _AddPageState(this._post, this._group) {
     editMode = _post.id != null;
+    groupMode = _group != null;
   }
 
   @override
@@ -136,15 +144,25 @@ class _AddPageState extends State<AddPage> {
                       isLoading = true;
                     });
 
+                    //From post_utils.dart
                     getInstagramData(username).then((data) {
                       _post.mediaUrl = data['url'];
                       _post.mediaData = data['username'];
                       _post.type = "NORMAL";
+                      _post.owner = UserService.currentUser.name;
+                      _post.ownerId = UserService.currentUser.id;
 
-                      if (editMode)
-                        _userService.updatePost(_post).then((arg) => Navigator.pop(context));
-                      else
-                        _userService.createPost(_post).then((arg) => Navigator.pop(context));
+                      if (!groupMode) {
+                        if (editMode)
+                          _userService.updatePost(_post).then((arg) => Navigator.pop(context));
+                        else
+                          _userService.createPost(_post).then((arg) => Navigator.pop(context));
+                      } else {
+                        if (editMode)
+                          _groupService.updatePost(widget.group, _post).then((arg) => Navigator.pop(context));
+                        else
+                          _groupService.createPost(widget.group, _post).then((arg) => Navigator.pop(context));
+                      }
 
                     });
                   }

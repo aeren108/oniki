@@ -37,7 +37,36 @@ class GroupService {
       await userRef.document(user.id).collection("groups").document(g.id).delete();
     }
 
+    groupRef.document(g.id).collection("posts").getDocuments().then((snapshot) {
+      for (var doc in snapshot.documents)
+        doc.reference.delete();
+    });
+
+    groupRef.document(g.id).collection("members").getDocuments().then((snapshot) {
+      for (var doc in snapshot.documents)
+        doc.reference.delete();
+    });
+
     await groupRef.document(g.id).delete();
+  }
+
+  Future<Post> createPost(Group g, Post p) async {
+    DocumentReference doc = groupRef.document(g.id).collection("posts").document();
+    p.id = doc.documentID;
+
+    await doc.setData(p.toMap());
+
+    return p;
+  }
+
+  Future<void> updatePost(Group g, Post p) async {
+    DocumentReference doc = groupRef.document(g.id).collection("posts").document(p.id);
+
+    await doc.setData(p.toMap());
+  }
+
+  Future<void> deletePost(Group g, Post p) async {
+    await groupRef.document(g.id).collection("posts").document(p.id).delete();
   }
 
   Future<List<Post>> getGroupPosts(Group g) async {

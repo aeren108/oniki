@@ -2,6 +2,7 @@ class Post {
   String id, name, type, mediaUrl, mediaData = "";
   double rate = 0;
   bool visibility = true;
+  String owner = "", ownerId; //For group posts
 
   Post();
   Post.newPost(this.name, this.rate, this.mediaUrl);
@@ -14,6 +15,8 @@ class Post {
     mediaData = map['mediaData'];
     rate = map['rate'];
     visibility = map['visibility'];
+    owner = map['owner'];
+    ownerId = map['ownerId'];
   }
 
   Map<String, dynamic> toMap() => {
@@ -23,7 +26,9 @@ class Post {
     'url': mediaUrl,
     'mediaData': mediaData,
     'rate': rate,
-    'visibility': visibility
+    'visibility': visibility,
+    'owner': owner,
+    'ownerId': ownerId
   };
 
 }

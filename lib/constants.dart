@@ -36,7 +36,6 @@ SnackBar alertSnackBar(String text) => SnackBar(
                                         content: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                                         backgroundColor: alertColor,
                                         behavior: SnackBarBehavior.floating);
-
 SnackBar infoSnackBar(String text) => SnackBar(
                                         content: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                                         backgroundColor: infoColor,

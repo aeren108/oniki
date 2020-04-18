@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => HomePage(),
         '/register': (context) => RegisterPage(),
         '/login': (context) => LoginPage(),
-        '/add': (context) => AddPage(),
+        '/add': (context) => AddPage(null),
         '/user-settings': (context) => UserSettingsPage(),
         '/empty': (context) => Container()
       },
