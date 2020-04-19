@@ -16,35 +16,42 @@ class GroupMembers extends StatefulWidget {
 class _GroupMembersState extends State<GroupMembers> with AutomaticKeepAliveClientMixin {
   final _groupService = GroupService.instance;
 
-  List<User> members = [];
+  Future<List<User>> _future;
 
   @override
   Widget build(BuildContext context) {
+    _future = _groupService.getGroupMembers(widget.group);
+
     return Scaffold(
-      body:  FutureBuilder(
-        future: _groupService.getGroupMembers(widget.group),
-        builder: (context, snapshot) {
-          if ((snapshot.connectionState != ConnectionState.done || !snapshot.hasData) && members.isEmpty)
-            return Center(child: CircularProgressIndicator());
-
-          members = snapshot.data;
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-            child: ListView.builder(
-                itemCount: members.length,
-                itemBuilder: (context, index) {
-                  User u = members[index];
-                  return Column(
-                    children: <Widget>[
-                      MemberTile(member: u, admin: widget.group.admin),
-                      Divider(thickness: 1.0)
-                    ]
-                  );
-                }
-            )
-          );
+      body:  RefreshIndicator(
+        onRefresh: () {
+          setState(() {});
+          return _future = _groupService.getGroupMembers(widget.group);
         },
+        child: FutureBuilder(
+          future: _future,
+          builder: (context, snapshot) {
+            print(widget.group.members);
+            if ((snapshot.connectionState != ConnectionState.done || !snapshot.hasData) && widget.group.members.isEmpty)
+              return Center(child: CircularProgressIndicator());
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+              child: ListView.builder(
+                  itemCount: widget.group.members.length,
+                  itemBuilder: (context, index) {
+                    User u = widget.group.members[index];
+                    return Column(
+                      children: <Widget>[
+                        MemberTile(member: u, admin: widget.group.admin),
+                        Divider(thickness: 1.0)
+                      ]
+                    );
+                  }
+              )
+            );
+          },
+        ),
       )
     );
   }

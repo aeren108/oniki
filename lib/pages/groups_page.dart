@@ -48,7 +48,23 @@ class _GroupsPageState extends State<GroupsPage> {
                   if ((snapshot.connectionState != ConnectionState.done || !snapshot.hasData) && _groups.isEmpty)
                     return Center(child: CircularProgressIndicator());
 
-                  _groups = snapshot.data;
+                  List<Group> fetchedGroups = snapshot.data;
+                  for (int i = 0; i < fetchedGroups.length; i++) {
+                    var g1 = fetchedGroups[i];
+                    int duplicateCount = 0;
+
+                    for (var g2 in _groups) {
+
+                      if (g1 == g2) {
+                        fetchedGroups.remove(g1);
+                        duplicateCount++;
+                      }
+                    }
+
+                    i -= duplicateCount;
+                  }
+
+                  _groups.addAll(fetchedGroups);
 
                   if (_groups.isEmpty)
                     return Center(child: Text("Katıldığın hiçbir grup yok.", style: TextStyle(fontSize: 24)));
@@ -159,10 +175,13 @@ class _GroupsPageState extends State<GroupsPage> {
                           labelText: 'Grup İsmi',
                           border: OutlineInputBorder()
                         ),
+                        maxLength: 25,
                         onSaved: (name) => groupName = name,
                         validator: (name) {
                           if (name.isEmpty)
                             return "Grup ismi boş olamaz";
+                          else if (name.length > 25)
+                            return "Grup ismi 25 karakterden fazla olamaz";
                           return null;
                         },
                       ),

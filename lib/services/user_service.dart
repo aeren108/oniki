@@ -55,6 +55,7 @@ class UserService {
   Future<void> createPost(Post p) async {
     CollectionReference userPostRef = postRef.document(currentUser.id).collection('posts');
     DocumentReference doc = userPostRef.document();
+
     String id = doc.documentID;
     p.id = id;
 
@@ -93,6 +94,10 @@ class UserService {
   Future<void> leaveGroup(Group g) async {
     await groupRef.document(g.id).collection("members").document(currentUser.id).delete();
     await userRef.document(currentUser.id).collection("groups").document(g.id).delete();
-  }
 
+    groupRef.document(g.id).collection("posts").where("ownerId", isEqualTo: currentUser.id).getDocuments().then((snapshot) {
+      for (var doc in snapshot.documents)
+        doc.reference.delete();
+    });
+  }
 }

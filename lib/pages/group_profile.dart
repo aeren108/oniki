@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/group.dart';
+import 'package:oniki/pages/group_feed.dart';
 import 'package:oniki/pages/group_members.dart';
 import 'package:oniki/pages/group_posts.dart';
 import 'package:oniki/services/group_service.dart';
@@ -47,31 +48,36 @@ class _GroupProfileState extends State<GroupProfile> with SingleTickerProviderSt
             onPressed: () { _showMenuBottomSheet(context); },
           )
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorWeight: 3.0,
-          indicatorColor: Colors.white,
-          tabs: <Widget>[
-            Tab(icon: Icon(Icons.dashboard)),
-            Tab(icon: Icon(Icons.star)),
-            Tab(icon: Icon(Icons.person))
-          ]
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(45.0),
+          child: Align(
+            alignment: Alignment.center,
+            child: Container(
+              width: MediaQuery.of(context).size.width / 2,
+              child: TabBar(
+                controller: _tabController,
+                indicatorWeight: 3.0,
+                indicatorColor: watermelon,
+                tabs: <Widget>[
+                  Tab(icon: Icon(Icons.dashboard)),
+                  Tab(icon: Icon(Icons.star)),
+                  Tab(icon: Icon(Icons.person))
+                ]
+              ),
+            ),
+          ),
         ),
       ),
 
       body: TabBarView(
         controller: _tabController,
         children: <Widget>[
-          _buildGroupFeed(context),
+          GroupFeed(group: widget.group),
           GroupPosts(group:  widget.group),
           GroupMembers(group: widget.group)
         ],
       )
     );
-  }
-
-  Widget _buildGroupFeed(BuildContext context) {
-    return Center(child: Text("Gruptaki kullanıcıların puanladıkları", style: TextStyle(fontSize: 24)));
   }
 
   //TODO: Admin panel
@@ -80,7 +86,7 @@ class _GroupProfileState extends State<GroupProfile> with SingleTickerProviderSt
       context: ctx,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(12.0), topRight: Radius.circular(12.0))
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0))
       ),
       builder: (context) {
         return Container(
@@ -125,6 +131,19 @@ class _GroupProfileState extends State<GroupProfile> with SingleTickerProviderSt
       ),
     ] : <Widget>[
       ListTile(
+        title: Text("Gruptan ayrıl", style: TextStyle(fontSize: 17)),
+        leading: Icon(Icons.cancel, color: Colors.black54, size: 28),
+        onTap: () {
+          _userService.leaveGroup(widget.group).then((arg) {
+            Navigator.pop(ctx);
+            Navigator.pop(context);
+          });
+        },
+      ),
+
+      Divider(thickness: 0.4, indent: 20, endIndent: 20, color: Colors.black87),
+
+      ListTile(
         title: SelectableText(widget.group.id, style: TextStyle(fontSize: 17)),
         leading: Icon(Icons.insert_link, color: Colors.black54, size: 28),
         trailing: IconButton(
@@ -135,19 +154,6 @@ class _GroupProfileState extends State<GroupProfile> with SingleTickerProviderSt
             _scaffoldKey.currentState.showSnackBar(infoSnackBar("Grup ID'si panoya kopyalandı"));
           },
         ),
-      ),
-
-      Divider(thickness: 0.4, indent: 20, endIndent: 20, color: Colors.black87),
-
-      ListTile(
-        title: Text("Gruptan ayrıl", style: TextStyle(fontSize: 17)),
-        leading: Icon(Icons.cancel, color: Colors.black54, size: 28),
-        onTap: () {
-          _userService.leaveGroup(widget.group).then((arg) {
-            Navigator.pop(ctx);
-            Navigator.pop(context);
-          });
-        },
       ),
     ];
   }

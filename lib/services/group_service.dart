@@ -4,6 +4,7 @@ import 'package:oniki/model/group.dart';
 import 'package:oniki/model/post.dart';
 import 'package:oniki/model/user.dart';
 import 'package:oniki/services/user_service.dart';
+import 'package:shortid/shortid.dart';
 
 class GroupService {
   static final GroupService _instance = GroupService._();
@@ -17,7 +18,7 @@ class GroupService {
   }
 
   Future<Group> createGroup(User u, String name) async {
-    DocumentReference doc = groupRef.document();
+    DocumentReference doc = groupRef.document(shortid.generate());
     Group g = Group.newGroup(doc.documentID, name, u.id);
 
     DocumentReference userDoc = userRef.document(u.id).collection("groups").document(g.id);
@@ -69,13 +70,34 @@ class GroupService {
     await groupRef.document(g.id).collection("posts").document(p.id).delete();
   }
 
+  Future<List<Post>> getGroupFeed(Group g, [bool updateMembers = false]) async {
+    List<Post> feed = [];
+
+    if (g.members == null || g.members.isEmpty || updateMembers)
+      await getGroupMembers(g);
+
+    for (var user in g.members) {
+      List<Post> userPosts = await UserService.instance.getPosts(user);
+      feed.addAll(userPosts);
+    }
+
+    //TODO: Sort by timestamp
+    feed.removeWhere((post) => !post.visibility);
+    g.feed = feed;
+    return feed;
+  }
+
   Future<List<Post>> getGroupPosts(Group g) async {
     QuerySnapshot query = await groupRef.document(g.id).collection("posts").getDocuments();
-    return <Post>[ for (var doc in query.documents) Post.fromMap(doc.data) ];
+    g.posts = <Post>[ for (var doc in query.documents) Post.fromMap(doc.data) ];
+
+    return g.posts;
   }
 
   Future<List<User>> getGroupMembers(Group g) async {
     QuerySnapshot query = await groupRef.document(g.id).collection("members").getDocuments();
-    return <User>[ for (var doc in query.documents) await UserService.instance.findUser(doc.documentID) ];
+    g.members = <User>[ for (var doc in query.documents) await UserService.instance.findUser(doc.documentID) ];
+
+    return g.members;
   }
 }

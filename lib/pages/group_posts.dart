@@ -20,7 +20,6 @@ class GroupPosts extends StatefulWidget{
 class _GroupPostsState extends State<GroupPosts> with AutomaticKeepAliveClientMixin {
   final _groupService = GroupService.instance;
 
-  List<Post> _posts = [];
   Future<List<Post>> _future;
 
   @override
@@ -40,17 +39,36 @@ class _GroupPostsState extends State<GroupPosts> with AutomaticKeepAliveClientMi
         child: FutureBuilder(
           future: _future,
           builder: (context, snapshot) {
-            if ((snapshot.connectionState != ConnectionState.done || !snapshot.hasData) && _posts.isEmpty)
+            if ((snapshot.connectionState != ConnectionState.done || !snapshot.hasData) && widget.group.posts.isEmpty)
               return Center(child: CircularProgressIndicator());
 
-            _posts = snapshot.data;
-
             return ListView.builder(
-              itemCount: _posts.length,
+              itemCount: widget.group.posts.length,
               itemBuilder: (context, index) => Column(
                 children: <Widget>[
-                  GroupPostTile(post: _posts[index], group: widget.group),
-                  Divider(thickness: 1.0)
+                  IgnorePointer(
+                    ignoring: (widget.group.posts[index].ownerId != UserService.currentUser.id),
+                    child: Dismissible(
+                      key: Key(widget.group.posts[index].id),
+                      background: Container(
+                        color: Colors.red,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 24.0),
+                          child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Icon(Icons.delete_forever, color: Colors.white, size: 38)
+                          ),
+                        ),
+                      ),
+                      direction: DismissDirection.endToStart,
+                      child: GroupPostTile(post: widget.group.posts[index], group: widget.group),
+                      onDismissed: (direction) {
+                        GroupService.instance.deletePost(widget.group, widget.group.posts[index]);
+                        setState(() { widget.group.posts.remove(widget.group.posts[index]); });
+                      },
+                    ),
+                  ),
+                  Divider(thickness: 1.0, indent: 10, endIndent: 10)
                 ],
               )
             );
