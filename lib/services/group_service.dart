@@ -81,14 +81,14 @@ class GroupService {
       feed.addAll(userPosts);
     }
 
-    //TODO: Sort by timestamp
     feed.removeWhere((post) => !post.visibility);
+    feed.sort((a, b) => -a.timestamp.compareTo(b.timestamp));
     g.feed = feed;
     return feed;
   }
 
   Future<List<Post>> getGroupPosts(Group g) async {
-    QuerySnapshot query = await groupRef.document(g.id).collection("posts").getDocuments();
+    QuerySnapshot query = await groupRef.document(g.id).collection("posts").orderBy("timestamp", descending: true).getDocuments();
     g.posts = <Post>[ for (var doc in query.documents) Post.fromMap(doc.data) ];
 
     return g.posts;

@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Post {
   String id, name, type, mediaUrl, mediaData = "";
   double rate = 0;
   bool visibility = true;
   String owner = "", ownerId; //For group posts
+  Timestamp timestamp;
 
   Post();
   Post.newPost(this.name, this.rate, this.mediaUrl);
@@ -17,6 +20,7 @@ class Post {
     visibility = map['visibility'];
     owner = map['owner'];
     ownerId = map['ownerId'];
+    timestamp = map['timestamp'];
   }
 
   Map<String, dynamic> toMap() => {
@@ -28,7 +32,8 @@ class Post {
     'rate': rate,
     'visibility': visibility,
     'owner': owner,
-    'ownerId': ownerId
+    'ownerId': ownerId,
+    'timestamp': timestamp
   };
 
 }

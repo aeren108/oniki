@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:oniki/model/group.dart';
 import 'package:oniki/model/post.dart';
+import 'package:oniki/pages/group_posts.dart';
 import 'package:oniki/services/group_service.dart';
-import 'package:oniki/services/user_service.dart';
 
-import 'add_page.dart';
-import 'group_posts.dart';
 
 class GroupFeed extends StatefulWidget {
   Group group;
@@ -26,10 +24,6 @@ class _GroupFeedState extends State<GroupFeed> {
     _future = _groupService.getGroupFeed(widget.group);
 
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AddPage(widget.group))),
-          child: Icon(Icons.add, size: 36, color: Colors.white),
-          backgroundColor: Colors.black54,),
         body: RefreshIndicator(
           onRefresh: () {
             setState(() {});
@@ -42,16 +36,16 @@ class _GroupFeedState extends State<GroupFeed> {
                 return Center(child: CircularProgressIndicator());
 
               return ListView.builder(
-                  itemCount: widget.group.feed.length,
-                  itemBuilder: (context, index) => Column(
-                    children: <Widget>[
-                      IgnorePointer(
-                        ignoring: true,
-                        child: GroupPostTile(post: widget.group.feed[index], group: widget.group),
-                      ),
-                      Divider(thickness: 1.0, indent: 10, endIndent: 10)
-                    ],
-                  )
+                itemCount: widget.group.feed.length,
+                itemBuilder: (context, index) => Column(
+                  children: <Widget>[
+                    IgnorePointer(
+                      ignoring: true,
+                      child: GroupPostTile(post: widget.group.feed[index], group: widget.group),
+                    ),
+                    Divider(thickness: 1.0, indent: 10, endIndent: 10)
+                  ],
+                )
               );
             },
           ),

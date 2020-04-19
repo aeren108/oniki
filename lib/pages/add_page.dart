@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
@@ -42,6 +43,7 @@ class _AddPageState extends State<AddPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0.0,
         backgroundColor: watermelon,
         flexibleSpace: appBarGradient,
         title: Text("Puanla", style: TextStyle(fontSize: 22)),
@@ -151,6 +153,7 @@ class _AddPageState extends State<AddPage> {
                       _post.type = "NORMAL";
                       _post.owner = UserService.currentUser.name;
                       _post.ownerId = UserService.currentUser.id;
+                      _post.timestamp = Timestamp.now();
 
                       if (!groupMode) {
                         if (editMode)

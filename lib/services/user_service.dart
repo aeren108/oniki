@@ -41,7 +41,7 @@ class UserService {
   }
 
   Future<List<Post>> getPosts(User u) async {
-    QuerySnapshot query = await postRef.document(u.id).collection('posts').getDocuments();
+    QuerySnapshot query = await postRef.document(u.id).collection('posts').orderBy("timestamp", descending: true).getDocuments();
 
     var posts = <Post>[];
     for (DocumentSnapshot doc in query.documents) {
