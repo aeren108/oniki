@@ -110,6 +110,7 @@ class _GroupProfileState extends State<GroupProfile> with SingleTickerProviderSt
             Icons.delete, color: Colors.black54, size: 28),
         onTap: () async {
           await _groupService.deleteGroup(widget.group);
+
           Navigator.pop(context);
           Navigator.pop(ctx);
         },

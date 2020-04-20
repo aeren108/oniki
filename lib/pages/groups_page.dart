@@ -6,6 +6,7 @@ import 'package:oniki/pages/group_profile.dart';
 import 'package:oniki/services/group_service.dart';
 import 'package:oniki/services/user_service.dart';
 import 'package:oniki/widgets/gradient_button.dart';
+import 'package:oniki/widgets/group_action.dart';
 
 class GroupsPage extends StatefulWidget {
   @override
@@ -121,17 +122,20 @@ class _GroupsPageState extends State<GroupsPage> {
     showModalBottomSheet(
         context: ctx,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0))
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0))
         ),
         isScrollControlled: true,
         elevation: 80.0,
         builder: (context) {
           return Container(
             height: 620,
-            child: JoinPage(
-              onJoin: () { setState(() {}); },
+            child: GroupAction(
+              actionType: ActionType.JOIN,
+              onSuccess: () {
+                setState(() {});
+              },
               onError: () {
-                Scaffold.of(ctx).showSnackBar(SnackBar(content: Text("Grup bulunamadı"), backgroundColor: alertColor, behavior: SnackBarBehavior.floating));
+                alertSnackBar("Grup bulunamadı");
               },
             )
           );
@@ -140,168 +144,30 @@ class _GroupsPageState extends State<GroupsPage> {
   }
 
   void _showCreateGroupBottomSheet(BuildContext ctx) {
-    final _formKey = GlobalKey<FormState>();
-
-    String groupName = "";
-    bool isLoading = false;
-
     showModalBottomSheet(
       context: ctx,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0))
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0))
       ),
       isScrollControlled: true,
       elevation: 24.0,
       builder: (context) {
-        return isLoading ? Center(child: CircularProgressIndicator()) : Container(
+        return Container(
           height: 620,
-          child: Form (
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: Text("Bir Grup Oluştur", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87)),
-                ),
-                Divider(thickness: 3.0, endIndent: 105, indent: 105, color: watermelon),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 60.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Grup İsmi',
-                          border: OutlineInputBorder()
-                        ),
-                        maxLength: 25,
-                        onSaved: (name) => groupName = name,
-                        validator: (name) {
-                          if (name.isEmpty)
-                            return "Grup ismi boş olamaz";
-                          else if (name.length > 25)
-                            return "Grup ismi 25 karakterden fazla olamaz";
-                          return null;
-                        },
-                      ),
-
-                      SizedBox(height: 20),
-
-                      GradientButton(
-                        child: Center(child: Text("Oluştur", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),)),
-                        colors: pinkBurgundyGrad,
-                        onPressed: () {
-                          if (_formKey.currentState.validate()) {
-                            _formKey.currentState.save();
-                            isLoading = true;
-                            _groupService.createGroup(UserService.currentUser, groupName).then((group) {
-                              Navigator.pop(context);
-                              setState(() {});
-                            });
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          child: GroupAction(
+            actionType: ActionType.CREATE,
+            onSuccess: () {
+              setState(() {});
+            },
+            onError: () {
+              alertSnackBar("Bir şeyler ters gitti");
+            },
+          )
         );
       }
     );
   }
 }
-
-//TODO: Make group create/join page for
-class JoinPage extends StatefulWidget {
-  VoidCallback onJoin;
-  VoidCallback onError;
-  JoinPage({ @required this.onJoin, @required this.onError });
-
-  @override
-  _JoinPageState createState() => _JoinPageState(onJoin, onError);
-}
-
-class _JoinPageState extends State<JoinPage> {
-  final _formKey = GlobalKey<FormState>();
-
-  String groupId;
-  bool isLoading = false;
-
-  VoidCallback onJoin;
-  VoidCallback onError;
-
-  _JoinPageState(this.onJoin, this.onError);
-
-  @override
-  Widget build(BuildContext context) {
-    return isLoading ? Center(child: CircularProgressIndicator()) : Form (
-      key: _formKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: Text("Bir Gruba Katıl", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87)),
-          ),
-          Divider(thickness: 3.0, endIndent: 110, indent: 110, color: watermelon),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 60.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                        labelText: 'Grup ID',
-                        border: OutlineInputBorder()
-                    ),
-                    onSaved: (id) => groupId = id,
-                    validator: (name) {
-                      if (name.isEmpty)
-                        return "Grup ID'si boş olamaz";
-                      return null;
-                    },
-                  ),
-                ),
-
-                SizedBox(height: 20),
-
-                GradientButton(
-                  child: Center(child: Text("Katıl", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold))),
-                  colors: pinkBurgundyGrad,
-                  onPressed: () {
-                    if (_formKey.currentState.validate()) {
-                      _formKey.currentState.save();
-
-                      setState(() { isLoading = true; });
-                      UserService.instance.joinGroup(groupId).then((group) {
-                        if (group == null) {
-                          setState(() { isLoading = false; });
-                          Navigator.pop(context);
-                          onError();
-                          return;
-                        }
-                        setState(() { isLoading = false; });
-                        Navigator.pop(context);
-                        onJoin();
-
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 
 class GroupTile extends StatelessWidget {
   Group group;

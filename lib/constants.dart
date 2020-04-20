@@ -33,10 +33,10 @@ final appBarGradient = Container(
 );
 
 SnackBar alertSnackBar(String text) => SnackBar(
-                                        content: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                                        content: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                                         backgroundColor: alertColor,
                                         behavior: SnackBarBehavior.floating);
 SnackBar infoSnackBar(String text) => SnackBar(
-                                        content: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                                        content: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                                         backgroundColor: infoColor,
                                         behavior: SnackBarBehavior.floating);

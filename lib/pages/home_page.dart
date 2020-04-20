@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedPage = 0;
-  var _pages = <Widget>[GroupsPage(), Center(child: Text("Boş")), ProfilePage()];
+  var _pages = <Widget>[GroupsPage(), Center(child: Text("İstekler")), Center(child: Text("Bildirimler")), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +26,7 @@ class _HomePageState extends State<HomePage> {
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.group), title: Container()),
+          BottomNavigationBarItem(icon: Icon(Icons.thumbs_up_down), title: Container()),
           BottomNavigationBarItem(icon: Icon(Icons.notifications), title: Container()),
           BottomNavigationBarItem(icon: Icon(Icons.account_circle), title: Container())
         ],

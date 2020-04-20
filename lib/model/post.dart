@@ -1,10 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Post {
-  String id, name, type, mediaUrl, mediaData = "";
+  String id;
+  String name;
+  String type;
+  String mediaUrl;
+  String mediaData;
+  String owner;
+  String ownerId; //For group posts
+
   double rate = 0;
+
   bool visibility = true;
-  String owner = "", ownerId; //For group posts
+
   Timestamp timestamp;
 
   Post();
