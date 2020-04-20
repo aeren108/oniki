@@ -31,7 +31,6 @@ class _GroupMembersState extends State<GroupMembers> with AutomaticKeepAliveClie
         child: FutureBuilder(
           future: _future,
           builder: (context, snapshot) {
-            print(widget.group.members);
             if ((snapshot.connectionState != ConnectionState.done || !snapshot.hasData) && widget.group.members.isEmpty)
               return Center(child: CircularProgressIndicator());
 

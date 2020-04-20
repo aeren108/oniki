@@ -110,7 +110,10 @@ class PostTile extends StatelessWidget {
         backgroundImage: NetworkImage(post.mediaUrl),
         radius: 24,
       ),
-      trailing: Text("${post.rate.toInt()} / 12", style: TextStyle(fontSize: 21, fontFamily: 'Duldolar', color: watermelon),),
+      trailing: Text(post.rate.floor().toString(),
+        style: TextStyle(fontSize: 32, color: watermelon, fontFamily: "Faster One")
+      ),
+
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) => AddPage.withPost(post, null)));
       },

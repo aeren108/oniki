@@ -13,7 +13,7 @@ final notifRef = _firestore.collection('notifications');
 
 final Color watermelon = Color(0xffED4C67);
 final Color alertColor = Color(0xffC03D29);
-final Color infoColor = Color(0xff9948d4);
+final Color infoColor = Color(0xff9759e3);
 
 final orangeRedGrad = <Color>[Color(0xfff7781e), Color(0xffed154b)];
 final greenBlueGrad = <Color>[Color(0xff43cea2), Color(0xff185a9d)];
@@ -35,8 +35,10 @@ final appBarGradient = Container(
 SnackBar alertSnackBar(String text) => SnackBar(
                                         content: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                                         backgroundColor: alertColor,
-                                        behavior: SnackBarBehavior.floating);
+                                        behavior: SnackBarBehavior.floating,
+                                        duration: Duration(seconds: 2, milliseconds: 500));
 SnackBar infoSnackBar(String text) => SnackBar(
                                         content: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                                         backgroundColor: infoColor,
-                                        behavior: SnackBarBehavior.floating);
+                                        behavior: SnackBarBehavior.floating,
+                                        duration: Duration(seconds: 1, milliseconds: 500));

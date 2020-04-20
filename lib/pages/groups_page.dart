@@ -66,6 +66,7 @@ class _GroupsPageState extends State<GroupsPage> {
                   }
 
                   _groups.addAll(fetchedGroups);
+                  UserService.currentUser.groups = _groups;
 
                   if (_groups.isEmpty)
                     return Center(child: Text("Katıldığın hiçbir grup yok.", style: TextStyle(fontSize: 24)));
@@ -122,7 +123,7 @@ class _GroupsPageState extends State<GroupsPage> {
     showModalBottomSheet(
         context: ctx,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0))
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0))
         ),
         isScrollControlled: true,
         elevation: 80.0,
@@ -147,7 +148,7 @@ class _GroupsPageState extends State<GroupsPage> {
     showModalBottomSheet(
       context: ctx,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0))
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0))
       ),
       isScrollControlled: true,
       elevation: 24.0,

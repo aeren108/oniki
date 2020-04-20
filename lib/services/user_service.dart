@@ -75,7 +75,9 @@ class UserService {
 
   Future<List<Group>> getGroups() async {
     QuerySnapshot query = await userRef.document(currentUser.id).collection("groups").getDocuments();
-    return <Group>[ for (var doc in query.documents) await GroupService.instance.findGroup(doc.documentID) ];
+    List<Group> groups = [ for (var doc in query.documents) await GroupService.instance.findGroup(doc.documentID) ];
+
+    return groups;
   }
 
   Future<Group> joinGroup(String id) async {

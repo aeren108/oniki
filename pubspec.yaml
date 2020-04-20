@@ -16,9 +16,6 @@ version: 1.0.0+1
 environment:
   sdk: ">=2.2.2 <3.0.0"
 
-
-
-
 dependencies:
   flutter:
     sdk: flutter
@@ -54,13 +51,12 @@ flutter:
   uses-material-design: true
 
   fonts:
-    - family: Duldolar
+    - family: Faster One
       fonts:
-        - asset: fonts/Duldolar.ttf
+        - asset: fonts/FasterOne.ttf
     - family: Bebas Neue
       fonts:
         - asset: fonts/BebasNeue.otf
-
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/

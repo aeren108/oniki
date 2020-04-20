@@ -33,10 +33,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/add'),
-        child: Icon(Icons.add, size: 36, color: Colors.white),
-        backgroundColor: Colors.black54,),
       body: (widget.user == null) ? Center(child: CircularProgressIndicator()) :
         NestedScrollView(
           headerSliverBuilder:(context, innerBoxIsScrolled) => <Widget>[

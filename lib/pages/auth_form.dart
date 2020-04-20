@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:oniki/constants.dart';
-import 'package:oniki/model/user.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
 import 'package:oniki/widgets/google_signin_button.dart';

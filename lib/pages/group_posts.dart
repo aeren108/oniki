@@ -99,14 +99,13 @@ class GroupPostTile extends StatelessWidget {
         backgroundImage: NetworkImage(post.mediaUrl),
         radius: 24,
       ),
-      trailing: Padding(
-        padding: const EdgeInsets.only(top: 10.0),
-        child: Column(
-          children: <Widget>[
-            Text("${post.rate.toInt()} / 12", style: TextStyle(fontSize: 21, fontFamily: 'Duldolar', color: watermelon)),
-            Text(post.owner, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700))
-          ],
-        ),
+      trailing: Column(
+        children: <Widget>[
+          Text(post.rate.floor().toString(),
+            style: TextStyle(fontSize: 31, color: watermelon, fontFamily: "Faster One")
+          ),
+          Text(post.owner, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700))
+        ],
       ),
       onTap: () {
         if (UserService.currentUser.id == post.ownerId)
