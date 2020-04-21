@@ -6,6 +6,7 @@ import 'package:oniki/pages/login_page.dart';
 import 'package:oniki/pages/register_page.dart';
 
 import 'package:oniki/pages/home_page.dart';
+import 'package:oniki/pages/request_post_page.dart';
 import 'package:oniki/pages/user_settings_page.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
@@ -41,7 +42,13 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.pink
+        primarySwatch: Colors.pink,
+        pageTransitionsTheme: PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder()
+          }
+        )
       ),
 
       initialRoute: initRoute,
@@ -51,6 +58,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/add': (context) => AddPage(null),
         '/user-settings': (context) => UserSettingsPage(),
+        '/request-post': (context) => RequestPostPage(),
         '/empty': (context) => Container()
       },
     );

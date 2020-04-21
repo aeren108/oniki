@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/user.dart';
+import 'package:oniki/pages/request_post_page.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
 import 'package:oniki/widgets/user_posts.dart';
@@ -8,31 +9,49 @@ import 'package:oniki/widgets/user_posts.dart';
 class ProfilePage extends StatefulWidget {
 
   User user = UserService.currentUser;
+  String id;
 
   ProfilePage();
   ProfilePage.withUser({ @required this.user });
+  ProfilePage.fromUserID({ @required this.id }) {
+    user = null;
+  }
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final _userService = UserService.instance;
+
   List<Widget> actionWidgets = [];
-  bool isCurrentUser;
+  bool isCurrentUser = false;
+  bool isLoading = false;
 
   @override
   void initState() {
-    isCurrentUser = widget.user.id == UserService.currentUser.id;
+    if (widget.user == null) {
+      isLoading = true;
+      _userService.findUser(widget.id).then((user) {
+        widget.user = user;
+        setState(() {isLoading = false;});
+      });
+
+    } else {
+      isCurrentUser = widget.user.id == UserService.currentUser.id;
+    }
 
     if (isCurrentUser)
       actionWidgets = <Widget>[IconButton(icon: Icon(Icons.menu), onPressed: () {_showBottomSheet(context);})];
+    else
+      actionWidgets = <Widget>[IconButton(icon: Icon(Icons.thumbs_up_down), onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => RequestPostPage(receiver: widget.user)));})];
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return isLoading ? Container(child: Center(child: CircularProgressIndicator()), color: Colors.white) : Scaffold(
       body: (widget.user == null) ? Center(child: CircularProgressIndicator()) :
         NestedScrollView(
           headerSliverBuilder:(context, innerBoxIsScrolled) => <Widget>[

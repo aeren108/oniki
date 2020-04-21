@@ -27,7 +27,10 @@ class _UserPostsState extends State<UserPosts> {
 
     return RefreshIndicator(
 
-      onRefresh: _refresh,
+      onRefresh: () {
+        setState(() {});
+        return _future = _userService.getPosts(widget.user);
+      },
       child: FutureBuilder(
         future: _future,
         builder: (BuildContext context, AsyncSnapshot<List<Post>> snapshot) {
@@ -88,12 +91,6 @@ class _UserPostsState extends State<UserPosts> {
       ),
     );
   }
-
-  Future<void> _refresh() {
-    setState(() {});
-    return _future = _userService.getPosts(widget.user);
-  }
-
 }
 
 class PostTile extends StatelessWidget {

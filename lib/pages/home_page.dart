@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/pages/global_add_page.dart';
 import 'package:oniki/pages/groups_page.dart';
+import 'package:oniki/pages/notifications_page.dart';
 import 'package:oniki/pages/profile_page.dart';
+import 'package:oniki/pages/requests_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedPage = 0;
-  var _pages = <Widget>[GroupsPage(), Center(child: Text("İstekler")), GlobalAddPage(), Center(child: Text("Bildirimler")), ProfilePage()];
+  var _pages = <Widget>[GroupsPage(), RequestsPage(), GlobalAddPage(), NotificationsPage(), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {

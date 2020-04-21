@@ -51,12 +51,14 @@ flutter:
   uses-material-design: true
 
   fonts:
+    - family: Bebas Neue
+      fonts:
+        - asset: fonts/BebasNeue.ttf
     - family: Faster One
       fonts:
         - asset: fonts/FasterOne.ttf
-    - family: Bebas Neue
-      fonts:
-        - asset: fonts/BebasNeue.otf
+
+
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/

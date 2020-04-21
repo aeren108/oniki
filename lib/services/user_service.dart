@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/group.dart';
+import 'package:oniki/model/notification.dart';
 import 'package:oniki/model/post.dart';
+import 'package:oniki/model/request.dart';
 import 'package:oniki/model/user.dart';
 import 'package:oniki/services/group_service.dart';
 
@@ -13,6 +15,8 @@ class UserService {
 
   static User get currentUser  => _currentUser;
   static set currentUser(User u) => _currentUser = u;
+
+  Map<String, User> userMap = {};
 
   UserService._();
 
@@ -29,9 +33,13 @@ class UserService {
   }
 
   Future<User> findUser(String id) async {
+    if (userMap[id] != null)
+      return userMap[id];
+
     DocumentSnapshot snapshot = await userRef.document(id).get();
-    if (snapshot.data != null)
-      return User.fromMap(snapshot.data);
+    if (snapshot.data != null) {
+      return userMap[id] = User.fromMap(snapshot.data);
+    }
     return null;
   }
 
@@ -101,5 +109,72 @@ class UserService {
       for (var doc in snapshot.documents)
         doc.reference.delete();
     });
+  }
+
+  Future<void> makeRequest(Request r) async {
+    DocumentReference doc = requestRef.document(currentUser.id).collection("requests").document();
+    r.id = doc.documentID;
+
+    Notification n = Notification(id: r.id, desc: r.desc, from: currentUser.id, name: r.name, media: r.media);
+    n.timestamp = Timestamp.now();
+    n.fromName = currentUser.name;
+    n.type = NotificationType.REQUEST;
+
+    await doc.setData(r.toMap());
+    await requestRef.document(r.receiver).collection("notifications").document(r.id).setData(n.toMap());
+  }
+
+  Future<bool> replyRequest(Notification n, Post p) async {
+    if (n.type == NotificationType.REPLY)
+      return false;
+
+    Notification willBeSent = Notification(id: n.id, desc: n.desc, name: n.name, media: n.media, from: currentUser.id);
+    willBeSent.type = NotificationType.REPLY;
+    willBeSent.data = p.rate;
+
+    n.replied = true;
+    p.id = n.id;
+
+    await requestRef.document(n.from).collection("notifications").document(n.id).setData(willBeSent.toMap());
+    await requestRef.document(n.from).collection("requests").document(n.id).delete();
+    await requestRef.document(currentUser.id).collection("notifications").document(n.id).updateData({'replied': true});
+    await updatePost(p);
+
+    return true;
+  }
+
+  Future<List<Request>> getRequests() async {
+    QuerySnapshot query = await requestRef.document(currentUser.id).collection("requests").orderBy("timestamp", descending: true).getDocuments();
+    List<Request> requests = [];
+
+    for (var doc in query.documents) {
+      Request r = Request.fromMap(doc.data);
+      findUser(r.receiver).then((user) => r.receiverUser = user);
+
+      requests.add(r);
+    }
+
+    return requests;
+  }
+
+  Future<List<Notification>> getNotifications() async {
+    QuerySnapshot query = await requestRef.document(currentUser.id).collection("notifications").orderBy("timestamp", descending: true).getDocuments();
+    List<Notification> notifs = [];
+
+    for (var doc in query.documents) {
+      Notification n = Notification.fromMap(doc.data);
+      findUser(n.from).then((user) => n.fromUser = user);
+
+      notifs.add(n);
+    }
+
+    return notifs;
+  }
+
+  Future<void> deleteNotification(Notification n) async {
+    if (!n.replied)
+      await requestRef.document(n.from).collection("requests").document(n.id).updateData({'rejected': true});
+
+    await requestRef.document(currentUser.id).collection("notifications").document(n.id).delete();
   }
 }
