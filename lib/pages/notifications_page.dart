@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/notification.dart' as Notif;
+import 'package:oniki/pages/notification_post_page.dart';
 import 'package:oniki/pages/profile_page.dart';
 import 'package:oniki/services/user_service.dart';
 
@@ -41,7 +43,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
             _notifs = snapshot.data;
 
             if (_notifs.isEmpty)
-              return Center(child: Text("Bildirim yok", style: TextStyle(fontSize: 32)));
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Center(child: Text("Bildirim yok", style: TextStyle(fontSize: 24))),
+                IconButton(icon: Icon(Icons.refresh), iconSize: 36, onPressed: () { setState(() {}); },)
+              ],
+            );
 
             return Padding(
               padding: const EdgeInsets.only(top: 4.0),
@@ -53,14 +61,50 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   if (n.type == Notif.NotificationType.REPLY)
                     return Column(
                       children: <Widget>[
-                        ReplyNotificationTile(notif: n),
+                        Dismissible(
+                          key: Key(n.id),
+                          background: Container(
+                            color: Colors.red,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 24.0),
+                              child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Icon(Icons.delete_forever, color: Colors.white, size: 38)
+                              ),
+                            ),
+                          ),
+                          direction: DismissDirection.endToStart,
+                          child: ReplyNotificationTile(notif: n),
+                          onDismissed: (direction) {
+                            _userService.deleteNotification(n);
+                            setState(() { _notifs.remove(n); });
+                          },
+                        ),
                         Divider(thickness: 1.0, indent: 10.0, endIndent: 10.0)
                       ],
                     );
                   else
                     return Column(
                       children: <Widget>[
-                        RequestNotificationTile(notif: n),
+                        Dismissible(
+                          direction: DismissDirection.endToStart,
+                          child: RequestNotificationTile(notif: n),
+                          key: Key(n.id),
+                          background: Container(
+                            color: Colors.red,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 24.0),
+                              child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Icon(Icons.delete_forever, color: Colors.white, size: 38)
+                              ),
+                            ),
+                          ),
+                          onDismissed: (direction) {
+                            _userService.deleteNotification(n);
+                            setState(() { _notifs.remove(n); });
+                          },
+                        ),
                         Divider(thickness: 1.0, indent: 10.0, endIndent: 10.0)
                       ]
                     );
@@ -88,7 +132,7 @@ class RequestNotificationTile extends StatelessWidget {
             child: Text(notif.fromName, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: watermelon)),
             onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage.fromUserID(id: notif.from))); },
           ),
-          Text(" bunu puanlamanızı istedi", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+          Text(" bunu puanlamanı istedi", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         ],
       ),
       subtitle: Text(notif.name, style: TextStyle(fontSize: 15)),
@@ -97,7 +141,7 @@ class RequestNotificationTile extends StatelessWidget {
         radius: 28
       ),
       onTap: () {
-        //TODO: notification post page
+        Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationPostPage(notif: notif)));
       },
     );
   }
@@ -110,7 +154,25 @@ class ReplyNotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return ListTile(
+      title: Row(
+        children: <Widget>[
+          InkWell(
+            child: Text(notif.fromName, style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w600, color: watermelon)),
+            onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage.fromUserID(id: notif.from))); },
+          ),
+          Text(" isteğine cevap verdi", style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
+        ],
+      ),
+      subtitle: Text(notif.name, style: TextStyle(fontSize: 15)),
+      leading: CircleAvatar(
+          child: Image(image: NetworkImage(notif.media)),
+          radius: 28
+      ),
+      trailing: Text(notif.rate.floor().toString(),
+        style: TextStyle(fontSize: 32, color: watermelon, fontFamily: "Faster One")
+      ),
+    );
   }
 }
 

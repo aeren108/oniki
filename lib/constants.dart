@@ -9,7 +9,6 @@ final userRef = _firestore.collection('users');
 final groupRef = _firestore.collection('groups');
 final postRef = _firestore.collection('posts');
 final requestRef = _firestore.collection('requests');
-final notifRef = _firestore.collection('notifications');
 
 final Color watermelon = Color(0xffED4C67);
 final Color alertColor = Color(0xffC03D29);

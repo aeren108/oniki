@@ -8,35 +8,36 @@ import 'package:oniki/pages/profile_page.dart';
 import 'package:oniki/pages/requests_page.dart';
 
 class HomePage extends StatefulWidget {
+  static int selectedPage = 0;
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedPage = 0;
   var _pages = <Widget>[GroupsPage(), RequestsPage(), GlobalAddPage(), NotificationsPage(), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedPage,
+        currentIndex: HomePage.selectedPage,
         unselectedItemColor: Colors.grey,
         elevation: 8.0,
         iconSize: bottomNavItemSize,
         fixedColor: Colors.black,
-        onTap: (int index) => setState(() {_selectedPage = index;}),
+        onTap: (int index) => setState(() {HomePage.selectedPage = index;}),
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.group), title: Container()),
           BottomNavigationBarItem(icon: Icon(Icons.thumbs_up_down), title: Container()),
-          BottomNavigationBarItem(icon: Icon(Icons.add_box, color: (_selectedPage == 2) ? Colors.black87 : watermelon , size: bottomNavItemSize * 1.3,), title: Container(),),
+          BottomNavigationBarItem(icon: Icon(Icons.add_box, color: (HomePage.selectedPage == 2) ? Colors.black87 : watermelon , size: bottomNavItemSize * 1.3,), title: Container(),),
           BottomNavigationBarItem(icon: Icon(Icons.notifications), title: Container()),
           BottomNavigationBarItem(icon: Icon(Icons.account_circle), title: Container())
         ],
       ),
       body: IndexedStack(
-        index: _selectedPage,
+        index: HomePage.selectedPage,
         children: _pages,
       )
     );

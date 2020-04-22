@@ -42,7 +42,7 @@ class _UserPostsState extends State<UserPosts> {
           if (_posts.isEmpty)
             return Center(child: Padding(
               padding: const EdgeInsets.only(top: 40),
-              child: Text("Puanlamak için '+'ya bas", style: TextStyle(fontSize: 24)),
+              child: Text("Puanlama yok", style: TextStyle(fontSize: 24)),
             ));
 
           if (widget.isPrivate) {

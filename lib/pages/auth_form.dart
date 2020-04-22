@@ -45,8 +45,8 @@ class AuthFormState extends State<AuthForm> {
             children: <Widget>[
               Text("ONİKİ",
                   style: TextStyle(
-                      fontSize: 64,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 72,
+                      fontWeight: FontWeight.w500,
                       //fontStyle: FontStyle.italic,
                       fontFamily: "Bebas Neue",
                       foreground: Paint()..shader = linearGradient
@@ -54,7 +54,7 @@ class AuthFormState extends State<AuthForm> {
               ),
 
               Padding(
-                padding: const EdgeInsets.only(top: 20.0),
+                padding: const EdgeInsets.only(top: 15.0),
                 child: Container(
                   child: Form(
                     key: _formKey,

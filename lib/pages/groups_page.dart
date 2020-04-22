@@ -38,44 +38,44 @@ class _GroupsPageState extends State<GroupsPage> {
           return _future = _userService.getGroups();
         },
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             //Groups list
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: FutureBuilder(
-                future: _future,
-                builder: (context, snapshot) {
-                  if ((snapshot.connectionState != ConnectionState.done || !snapshot.hasData) && _groups.isEmpty)
-                    return Center(child: CircularProgressIndicator());
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: FutureBuilder(
+                  future: _future,
+                  builder: (context, snapshot) {
+                    if ((snapshot.connectionState != ConnectionState.done || !snapshot.hasData) && _groups.isEmpty)
+                      return Center(child: CircularProgressIndicator());
 
-                  List<Group> fetchedGroups = snapshot.data;
-                  for (int i = 0; i < fetchedGroups.length; i++) {
-                    var g1 = fetchedGroups[i];
-                    int duplicateCount = 0;
+                    List<Group> fetchedGroups = snapshot.data;
+                    for (int i = 0; i < fetchedGroups.length; i++) {
+                      var g1 = fetchedGroups[i];
+                      int duplicateCount = 0;
 
-                    for (var g2 in _groups) {
+                      for (var g2 in _groups) {
 
-                      if (g1 == g2) {
-                        fetchedGroups.remove(g1);
-                        duplicateCount++;
+                        if (g1 == g2) {
+                          fetchedGroups.remove(g1);
+                          duplicateCount++;
+                        }
                       }
+
+                      i -= duplicateCount;
                     }
 
-                    i -= duplicateCount;
-                  }
+                    _groups.addAll(fetchedGroups);
+                    UserService.currentUser.groups = _groups;
 
-                  _groups.addAll(fetchedGroups);
-                  UserService.currentUser.groups = _groups;
+                    if (_groups.isEmpty)
+                      return Center(child: Text("Katıldığın hiçbir grup yok.", style: TextStyle(fontSize: 24)));
 
-                  if (_groups.isEmpty)
-                    return Center(child: Text("Katıldığın hiçbir grup yok.", style: TextStyle(fontSize: 24)));
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                    child: SizedBox(
-                      height: 400,
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
                       child: ListView.builder(
+                        physics: BouncingScrollPhysics(),
                         itemCount: _groups.length,
                         itemBuilder: (context, index) {
                           return Column(
@@ -86,9 +86,9 @@ class _GroupsPageState extends State<GroupsPage> {
                           );
                         },
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
 
@@ -105,14 +105,13 @@ class _GroupsPageState extends State<GroupsPage> {
                   Divider(thickness: 1, indent: 20, endIndent: 20),
 
                   ListTile(
-                    title: Text("Bir grup oluştur", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: watermelon)),
-                    leading: Icon(Icons.add, size: 36, color: Colors.black54),
-                    onTap: () { _showCreateGroupBottomSheet(context); }
+                      title: Text("Bir grup oluştur", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: watermelon)),
+                      leading: Icon(Icons.add, size: 36, color: Colors.black54),
+                      onTap: () { _showCreateGroupBottomSheet(context); }
                   ),
                 ],
               ),
             ),
-
           ],
         ),
       )

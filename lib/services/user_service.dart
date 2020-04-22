@@ -118,22 +118,52 @@ class UserService {
     Notification n = Notification(id: r.id, desc: r.desc, from: currentUser.id, name: r.name, media: r.media);
     n.timestamp = Timestamp.now();
     n.fromName = currentUser.name;
+    n.mediaData = r.mediaData;
+    n.rate = r.rate;
     n.type = NotificationType.REQUEST;
 
     await doc.setData(r.toMap());
     await requestRef.document(r.receiver).collection("notifications").document(r.id).setData(n.toMap());
   }
 
-  Future<bool> replyRequest(Notification n, Post p) async {
+  Future<void> updateRequest(Request r) async {
+    await requestRef.document(currentUser.id).collection("requests").document(r.id).setData(r.toMap());
+
+    Notification n = Notification(id: r.id, desc: r.desc, from: currentUser.id, name: r.name, media: r.media);
+    n.timestamp = Timestamp.now();
+    n.fromName = currentUser.name;
+    n.mediaData = r.mediaData;
+    n.rate = r.rate;
+    n.type = NotificationType.REQUEST;
+
+    await requestRef.document(r.receiver).collection("notifications").document(r.id).setData(n.toMap());
+  }
+
+  Future<bool> replyRequest(Notification n) async {
     if (n.type == NotificationType.REPLY)
       return false;
 
+    Post p = Post();
+
     Notification willBeSent = Notification(id: n.id, desc: n.desc, name: n.name, media: n.media, from: currentUser.id);
     willBeSent.type = NotificationType.REPLY;
-    willBeSent.data = p.rate;
+    willBeSent.rate = n.rate;
+    willBeSent.mediaData = n.mediaData;
+    willBeSent.fromName = currentUser.name;
+    willBeSent.timestamp = Timestamp.now();
 
     n.replied = true;
+
     p.id = n.id;
+    p.name = n.name;
+    p.mediaUrl = n.media;
+    p.mediaData = n.mediaData;
+    p.type = "NORMAL";
+    p.rate = n.rate;
+    p.visibility = true;
+    p.owner = currentUser.name;
+    p.ownerId = currentUser.id;
+    p.timestamp = Timestamp.now();
 
     await requestRef.document(n.from).collection("notifications").document(n.id).setData(willBeSent.toMap());
     await requestRef.document(n.from).collection("requests").document(n.id).delete();
@@ -158,7 +188,10 @@ class UserService {
   }
 
   Future<List<Notification>> getNotifications() async {
-    QuerySnapshot query = await requestRef.document(currentUser.id).collection("notifications").orderBy("timestamp", descending: true).getDocuments();
+    QuerySnapshot query = await requestRef.document(currentUser.id)
+        .collection("notifications").orderBy("timestamp", descending: true)
+        .getDocuments();
+
     List<Notification> notifs = [];
 
     for (var doc in query.documents) {
@@ -171,10 +204,15 @@ class UserService {
     return notifs;
   }
 
-  Future<void> deleteNotification(Notification n) async {
-    if (!n.replied)
-      await requestRef.document(n.from).collection("requests").document(n.id).updateData({'rejected': true});
+  void deleteNotification(Notification n) {
+    requestRef.document(currentUser.id).collection("notifications").document(n.id).delete();
 
-    await requestRef.document(currentUser.id).collection("notifications").document(n.id).delete();
+    if (!n.replied && n.type == NotificationType.REQUEST)
+      requestRef.document(n.from).collection("requests").document(n.id).updateData({'rejected': true});
+  }
+
+  deleteRequest(Request r) {
+    requestRef.document(currentUser.id).collection("requests").document(r.id).delete();
+    requestRef.document(r.receiver).collection("notifications").document(r.id).delete();
   }
 }

@@ -7,7 +7,10 @@ class Request {
   String receiver;
   String receiverName;
   String media;
+  String mediaData;
   String desc;
+
+  num rate = 0;
 
   bool replied = false;
   bool rejected = false;
@@ -22,7 +25,9 @@ class Request {
     receiver = data['receiver'];
     name = data['name'];
     media = data['media'];
+    mediaData = data['mediaData'];
     desc = data['desc'];
+    rate = data['rate'];
     receiverName = data['receiverName'];
     replied = data['replied'];
     rejected = data['rejected'];
@@ -34,7 +39,9 @@ class Request {
     'receiver': receiver,
     'name': name,
     'media': media,
+    'mediaData': mediaData,
     'desc': desc,
+    'rate': rate,
     'receiverName': receiverName,
     'replied': replied,
     'rejected': rejected,

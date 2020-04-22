@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/request.dart';
+import 'package:oniki/model/user.dart';
 import 'package:oniki/pages/profile_page.dart';
 import 'package:oniki/pages/request_post_page.dart';
 import 'package:oniki/services/user_service.dart';
@@ -42,7 +43,13 @@ class _RequestsPageState extends State<RequestsPage> {
             _requests = snapshot.data;
 
             if (_requests.isEmpty)
-              return Center(child: Text("İstek yok", style: TextStyle(fontSize: 24)));
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Center(child: Text("İstek yok", style: TextStyle(fontSize: 24))),
+                  IconButton(icon: Icon(Icons.refresh), iconSize: 36, onPressed: () { setState(() {}); },)
+                ],
+              );
 
             return Padding(
               padding: const EdgeInsets.only(top: 4.0),
@@ -53,8 +60,26 @@ class _RequestsPageState extends State<RequestsPage> {
 
                   return Column(
                     children: <Widget>[
-                      RequestTile(request: r),
-                      Divider(thickness: 1.0)
+                      Dismissible(
+                        key: Key(r.id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: Colors.red,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 24.0),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Icon(Icons.delete_forever, color: Colors.white, size: 38)
+                            ),
+                          ),
+                        ),
+                        child: RequestTile(request: r),
+                        onDismissed: (direction) {
+                          _userService.deleteRequest(r);
+                          setState(() { _requests.remove(r); });
+                        },
+                      ),
+                      Divider(thickness: 1.0, indent: 10.0, endIndent: 10.0)
                     ],
                   );
                 }
@@ -69,8 +94,19 @@ class _RequestsPageState extends State<RequestsPage> {
 
 class RequestTile extends StatelessWidget {
   Request request;
+  User receiver;
 
-  RequestTile({ @required this.request });
+  String info;
+
+  RequestTile({ @required this.request }) {
+    if (request.receiverUser == null)
+      request.receiverUser = User.newUser(request.receiverName, request.receiver);
+
+    if (request.rejected)
+      info = " bu isteği reddetti";
+    else
+      info = "'e bir istekte bulundun";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,9 +115,14 @@ class RequestTile extends StatelessWidget {
         children: <Widget>[
           InkWell(
             child: Text(request.receiverName, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: watermelon)),
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage.fromUserID(id: request.receiver))),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) {
+              if (request.receiverUser == null)
+                return ProfilePage.fromUserID(id: request.receiver);
+              else
+                return ProfilePage.withUser(user: request.receiverUser);
+            })),
           ),
-          Text("'e bir istekte bulundun", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+          Text(info, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
         ],
       ),
       subtitle: Text(request.name, style: TextStyle(fontSize: 15)),
@@ -89,12 +130,7 @@ class RequestTile extends StatelessWidget {
         child: Image(image: NetworkImage(request.media)),
         radius: 28,
       ),
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) {
-        if (request.receiverUser == null)
-          return ProfilePage.fromUserID(id: request.receiver);
-        else
-          return ProfilePage.withUser(user: request.receiverUser);
-      })),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RequestPostPage(receiver: request.receiverUser, request: request))),
     );
   }
 }

@@ -4,14 +4,16 @@ import 'package:oniki/constants.dart';
 import 'package:oniki/model/post.dart';
 import 'package:oniki/model/request.dart';
 import 'package:oniki/model/user.dart';
+import 'package:oniki/pages/home_page.dart';
 import 'package:oniki/services/user_service.dart';
 import 'package:oniki/utils/post_utils.dart';
 import 'package:oniki/widgets/gradient_button.dart';
 
 class RequestPostPage extends StatefulWidget {
   User receiver;
+  Request request = Request();
 
-  RequestPostPage({@required this.receiver });
+  RequestPostPage({ @required this.receiver, this.request });
 
   @override
   _RequestPostPageState createState() => _RequestPostPageState();
@@ -21,10 +23,17 @@ class _RequestPostPageState extends State<RequestPostPage> {
   final _userService = UserService.instance;
   final _formKey = GlobalKey<FormState>();
 
-  Request _request = Request();
-
   String username;
   bool isLoading = false;
+  bool editMode = false;
+
+  @override
+  void initState() {
+    editMode = widget.request != null;
+    if (!editMode)
+      widget.request = Request();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +59,7 @@ class _RequestPostPageState extends State<RequestPostPage> {
                 children: <Widget>[
 
                   TextFormField(
-                    initialValue: _request.name,
+                    initialValue: widget.request.name ?? "",
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: "İsim / Başlık",
@@ -62,7 +71,7 @@ class _RequestPostPageState extends State<RequestPostPage> {
                       return null;
                     },
                     onSaved: (name) {
-                      _request.name = name;
+                      widget.request.name = name;
                     },
                   ),
 
@@ -84,7 +93,9 @@ class _RequestPostPageState extends State<RequestPostPage> {
                     },
                   ),
 
-                  SizedBox(height: 35.0),
+                  SizedBox(height: 18.0),
+                  Divider(thickness: 1.0),
+                  SizedBox(height: 18.0),
 
                   TextFormField(
                     initialValue: "",
@@ -95,7 +106,7 @@ class _RequestPostPageState extends State<RequestPostPage> {
                     ),
 
                     onSaved: (desc) {
-                      _request.desc = desc;
+                      widget.request.desc = desc;
                     },
                   ),
 
@@ -107,18 +118,34 @@ class _RequestPostPageState extends State<RequestPostPage> {
                         if (_formKey.currentState.validate()) {
                           _formKey.currentState.save();
 
+                          if (widget.request.rejected) {
+                            Scaffold.of(context).showSnackBar(infoSnackBar("Bu istek reddedildi"));
+                            return;
+                          }
+
                           setState(() { isLoading = true; });
 
                           //From post_utils.dart
                           getInstagramData(username).then((data) {
-                            _request.receiver = widget.receiver.id;
-                            _request.receiverName = widget.receiver.name;
-                            _request.media = data['url'];
-                            _request.timestamp = Timestamp.now();
+                            widget.request.receiver = widget.receiver.id;
+                            widget.request.receiverName = widget.receiver.name;
+                            widget.request.media = data['url'];
+                            widget.request.mediaData = data['username'];
+                            widget.request.timestamp = Timestamp.now();
 
-                            _userService.makeRequest(_request).then((success) {
+                            if (editMode) {
+                              _userService.updateRequest(widget.request).then((arg) {
+                                setState(() { isLoading = true; });
+                                Navigator.pop(context);
+                              });
+
+                              return;
+                            }
+
+                            _userService.makeRequest(widget.request).then((success) {
                               setState(() { isLoading = false; });
-                              Navigator.pop(context);
+                              HomePage.selectedPage = 1;
+                              Navigator.of(context).popUntil(ModalRoute.withName('/home'));
                             });
 
                           });

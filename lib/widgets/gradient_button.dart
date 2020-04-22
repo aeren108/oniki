@@ -4,8 +4,9 @@ class GradientButton extends StatelessWidget {
   Widget child;
   VoidCallback onPressed;
   List<Color> colors;
+  bool enabled = true;
 
-  GradientButton({@required this.child, @required this.onPressed, this.colors});
+  GradientButton({@required this.child, @required this.onPressed, this.colors, this.enabled});
 
   @override
   Widget build(BuildContext context) {

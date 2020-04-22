@@ -6,16 +6,16 @@ class Notification {
   String from;
   String name;
   String media;
+  String mediaData;
   String desc;
   String fromName;
 
-  double data;
+  num rate = 0;
 
   int _type;
   void set type(NotificationType type) => this._type = type.index;
   NotificationType get type => NotificationType.values[_type];
 
-  bool read = false;
   bool replied = false;
 
   Timestamp timestamp;
@@ -28,9 +28,10 @@ class Notification {
     from = data['from'];
     name = data['name'];
     media = data['media'];
+    mediaData = data['mediaData'];
     desc = data['desc'];
+    rate = data['rate'];
     _type = data['type'];
-    read = data['read'];
     fromName = data['fromName'];
     replied = data['replied'];
     timestamp = data['timestamp'];
@@ -42,9 +43,10 @@ class Notification {
     data['from'] = this.from;
     data['name'] = this.name;
     data['media'] = this.media;
+    data['mediaData'] = this.mediaData;
     data['desc'] = this.desc;
+    data['rate'] = this.rate;
     data['type'] = this._type;
-    data['read'] = this.read;
     data['fromName'] = this.fromName;
     data['replied'] = this.replied;
     data['timestamp'] = this.timestamp;
