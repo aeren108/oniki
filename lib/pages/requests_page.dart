@@ -1,3 +1,5 @@
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/request.dart';
@@ -113,16 +115,28 @@ class RequestTile extends StatelessWidget {
     return ListTile(
       title: Row(
         children: <Widget>[
-          InkWell(
-            child: Text(request.receiverName, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: watermelon)),
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) {
-              if (request.receiverUser == null)
-                return ProfilePage.fromUserID(id: request.receiver);
-              else
-                return ProfilePage.withUser(user: request.receiverUser);
-            })),
+          Flexible(
+            child: AutoSizeText.rich(TextSpan(
+              children: [
+                TextSpan(
+                  text: request.receiverName,
+                  style: TextStyle(color: watermelon),
+                  recognizer: TapGestureRecognizer()..onTap = () => Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    if (request.receiverUser == null)
+                      return ProfilePage.fromUserID(id: request.receiver);
+                    else
+                      return ProfilePage.withUser(user: request.receiverUser);
+                  }))
+                ),
+
+                TextSpan(
+                  text: info
+                )
+              ]
+            ),
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+            maxLines: 1)
           ),
-          Text(info, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
         ],
       ),
       subtitle: Text(request.name, style: TextStyle(fontSize: 15)),

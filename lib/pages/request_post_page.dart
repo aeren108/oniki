@@ -78,6 +78,7 @@ class _RequestPostPageState extends State<RequestPostPage> {
                   SizedBox(height: 10.0),
 
                   TextFormField(
+                    initialValue: widget.request.mediaData,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: "Instagram",
@@ -98,7 +99,7 @@ class _RequestPostPageState extends State<RequestPostPage> {
                   SizedBox(height: 18.0),
 
                   TextFormField(
-                    initialValue: "",
+                    initialValue: widget.request.desc,
                     maxLines: 2,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),

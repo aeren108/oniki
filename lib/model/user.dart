@@ -1,4 +1,5 @@
 import 'package:oniki/model/group.dart';
+import 'package:oniki/model/notification.dart';
 
 class User {
   String id;

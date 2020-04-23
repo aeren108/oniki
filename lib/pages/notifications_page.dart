@@ -1,7 +1,10 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/notification.dart' as Notif;
+import 'package:oniki/pages/home_page.dart';
 import 'package:oniki/pages/notification_post_page.dart';
 import 'package:oniki/pages/profile_page.dart';
 import 'package:oniki/services/user_service.dart';
@@ -41,6 +44,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
               return Center(child: CircularProgressIndicator());
 
             _notifs = snapshot.data;
+            HomePage.badgeStreamCtrl.add(_notifs.length);
 
             if (_notifs.isEmpty)
               return Column(
@@ -58,7 +62,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 itemBuilder: (context, index) {
                   Notif.Notification n = _notifs[index];
 
-                  if (n.type == Notif.NotificationType.REPLY)
+                  if (n.type == Notif.NotificationType.REPLY) {
                     return Column(
                       children: <Widget>[
                         Dismissible(
@@ -69,7 +73,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               padding: const EdgeInsets.only(right: 24.0),
                               child: Align(
                                   alignment: Alignment.centerRight,
-                                  child: Icon(Icons.delete_forever, color: Colors.white, size: 38)
+                                  child: Icon(
+                                      Icons.delete_forever, color: Colors.white,
+                                      size: 38)
                               ),
                             ),
                           ),
@@ -77,13 +83,15 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           child: ReplyNotificationTile(notif: n),
                           onDismissed: (direction) {
                             _userService.deleteNotification(n);
-                            setState(() { _notifs.remove(n); });
+                            setState(() {
+                              _notifs.remove(n);
+                            });
                           },
                         ),
                         Divider(thickness: 1.0, indent: 10.0, endIndent: 10.0)
                       ],
                     );
-                  else
+                  } else {
                     return Column(
                       children: <Widget>[
                         Dismissible(
@@ -96,18 +104,22 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               padding: const EdgeInsets.only(right: 24.0),
                               child: Align(
                                   alignment: Alignment.centerRight,
-                                  child: Icon(Icons.delete_forever, color: Colors.white, size: 38)
+                                  child: Icon(Icons.delete_forever,
+                                      color: Colors.white, size: 38)
                               ),
                             ),
                           ),
                           onDismissed: (direction) {
                             _userService.deleteNotification(n);
-                            setState(() { _notifs.remove(n); });
+                            setState(() {
+                              _notifs.remove(n);
+                            });
                           },
                         ),
                         Divider(thickness: 1.0, indent: 10.0, endIndent: 10.0)
                       ]
                     );
+                  }
                 }
               ),
             );
@@ -128,13 +140,31 @@ class RequestNotificationTile extends StatelessWidget {
     return ListTile(
       title: Row(
         children: <Widget>[
-          InkWell(
-            child: Text(notif.fromName, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: watermelon)),
-            onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage.fromUserID(id: notif.from))); },
+          Flexible(
+            child: AutoSizeText.rich(TextSpan(
+              children: [
+                TextSpan(
+                  text: notif.fromName,
+                  style: TextStyle(color: watermelon),
+                  recognizer: TapGestureRecognizer()..onTap = () => Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    if (notif.fromUser == null)
+                      return ProfilePage.fromUserID(id: notif.from);
+                    else
+                      return ProfilePage.withUser(user: notif.fromUser);
+                  }))
+                ),
+
+                TextSpan(
+                  text: " bunu puanlamanı istedi"
+                )
+              ]),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              maxLines: 1
+            )
           ),
-          Text(" bunu puanlamanı istedi", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         ],
       ),
+
       subtitle: Text(notif.name, style: TextStyle(fontSize: 15)),
       leading: CircleAvatar(
         child: Image(image: NetworkImage(notif.media)),
@@ -157,13 +187,31 @@ class ReplyNotificationTile extends StatelessWidget {
     return ListTile(
       title: Row(
         children: <Widget>[
-          InkWell(
-            child: Text(notif.fromName, style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w600, color: watermelon)),
-            onTap: () { Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage.fromUserID(id: notif.from))); },
+          Flexible(
+            child: AutoSizeText.rich(TextSpan(
+              children: [
+                TextSpan(
+                  text: notif.fromName,
+                  style: TextStyle(color: watermelon),
+                  recognizer: TapGestureRecognizer()..onTap = () => Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    if (notif.fromUser == null)
+                      return ProfilePage.fromUserID(id: notif.from);
+                    else
+                      return ProfilePage.withUser(user: notif.fromUser);
+                  }))
+                ),
+
+                TextSpan(
+                  text: " isteğini cevapladı"
+                )
+              ]),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              maxLines: 1
+            )
           ),
-          Text(" isteğine cevap verdi", style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
         ],
       ),
+
       subtitle: Text(notif.name, style: TextStyle(fontSize: 15)),
       leading: CircleAvatar(
           child: Image(image: NetworkImage(notif.media)),

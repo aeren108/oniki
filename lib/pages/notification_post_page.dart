@@ -17,6 +17,8 @@ class NotificationPostPage extends StatefulWidget {
 
 class _NotificationPostPageState extends State<NotificationPostPage> {
   final _userService = UserService.instance;
+
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
 
   bool isLoading = false;
@@ -24,6 +26,7 @@ class _NotificationPostPageState extends State<NotificationPostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         elevation: 0.0,
         backgroundColor: watermelon,
@@ -107,7 +110,7 @@ class _NotificationPostPageState extends State<NotificationPostPage> {
                     child: Center(child: Text("İsteği Cevapla", style: TextStyle(fontSize: 22, color: Colors.white),)),
                     onPressed: ()  {
                       if (widget.notif.replied) {
-                        Scaffold.of(context).showSnackBar(infoSnackBar("Zaten isteği cevapladın"));
+                        _scaffoldKey.currentState.showSnackBar(infoSnackBar("Zaten isteği cevapladın"));
                         return;
                       }
 

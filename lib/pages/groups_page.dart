@@ -51,22 +51,16 @@ class _GroupsPageState extends State<GroupsPage> {
                       return Center(child: CircularProgressIndicator());
 
                     List<Group> fetchedGroups = snapshot.data;
-                    for (int i = 0; i < fetchedGroups.length; i++) {
-                      var g1 = fetchedGroups[i];
-                      int duplicateCount = 0;
 
-                      for (var g2 in _groups) {
+                    for (var group in fetchedGroups) {
+                      if (_groups.contains(group))
+                        continue;
 
-                        if (g1 == g2) {
-                          fetchedGroups.remove(g1);
-                          duplicateCount++;
-                        }
-                      }
-
-                      i -= duplicateCount;
+                      _groups.add(group);
                     }
 
-                    _groups.addAll(fetchedGroups);
+                    _groups.removeWhere((group) => !fetchedGroups.contains(group));
+
                     UserService.currentUser.groups = _groups;
 
                     if (_groups.isEmpty)
