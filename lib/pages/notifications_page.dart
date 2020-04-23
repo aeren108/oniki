@@ -44,7 +44,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
               return Center(child: CircularProgressIndicator());
 
             _notifs = snapshot.data;
-            HomePage.badgeStreamCtrl.add(_notifs.length);
+            HomePage.badgeStreamCtrl.sink.add(_notifs.length);
 
             if (_notifs.isEmpty)
               return Column(

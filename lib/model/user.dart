@@ -4,9 +4,11 @@ import 'package:oniki/model/notification.dart';
 class User {
   String id;
   String name;
-  String photo = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+  String photo = PHOTO_PLACEHOLDER;
 
   List<Group> groups = [];
+
+  static const String PHOTO_PLACEHOLDER = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
 
   User.newUser(this.name, this.id);
 

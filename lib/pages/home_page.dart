@@ -8,12 +8,11 @@ import 'package:oniki/pages/groups_page.dart';
 import 'package:oniki/pages/notifications_page.dart';
 import 'package:oniki/pages/profile_page.dart';
 import 'package:oniki/pages/requests_page.dart';
-import 'package:oniki/services/user_service.dart';
 import 'package:oniki/widgets/notification_badge.dart';
 
 class HomePage extends StatefulWidget {
   static int selectedPage = 0;
-  static StreamController badgeStreamCtrl = StreamController<int>();
+  static StreamController badgeStreamCtrl = StreamController.broadcast();
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -48,4 +47,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

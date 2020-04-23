@@ -29,6 +29,8 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
 
   bool isLoading = false;
   bool groupMode = false;
+  bool isInstaSet = false;
+  bool instaLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +46,7 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
         height: double.infinity,
         child: SingleChildScrollView(
           physics: BouncingScrollPhysics(),
-          padding: EdgeInsets.only(top: 80.0),
+          padding: EdgeInsets.only(top: 15.0),
           child: Form(
             key: _formKey,
             child: Padding(
@@ -52,6 +54,16 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  instaLoading ? Container(
+                    width: 90,
+                    height: 90,
+                    child: CircularProgressIndicator()) : CircleAvatar(
+                      backgroundImage: isInstaSet ? NetworkImage(_post.mediaUrl) : NetworkImage(User.PHOTO_PLACEHOLDER),
+                      radius: 45,
+                  ),
+
+                  SizedBox(height: 10.0),
+
                   OutlineButton(
                     highlightElevation: 8.0,
                     child: Container(
@@ -96,21 +108,56 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
 
                   SizedBox(height: 10),
 
-                  TextFormField(
-                    initialValue: _post.mediaData,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Insta",
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: TextFormField(
+                            initialValue: _post.mediaData,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: "Insta",
+                            ),
+                            validator: (username) {
+                              if (username.isEmpty)
+                                return "Insta boş olamaz";
+                              return null;
+                            },
+                            onSaved: (username) {
+                              this.username = username;
+                            },
+                          ),
+                        ),
+                      ),
 
-                    ),
-                    validator: (username) {
-                      if (username.isEmpty)
-                        return "Insta boş olamaz";
-                      return null;
-                    },
-                    onSaved: (username) {
-                      this.username = username;
-                    },
+                      Expanded(
+                        flex: 1,
+                        child: GradientButton(
+                          enabled: !instaLoading,
+                          child: Icon(Icons.done, size: 36),
+                          onPressed: () {
+                            if (_formKey.currentState.validate()) {
+                              _formKey.currentState.save();
+
+                              setState(() { instaLoading = true; });
+
+                              //From post_utils.dart (getInstagramData)
+                              getInstagramData(username).then((data) {
+                                setState(() {
+                                  _post.mediaUrl = data['url'];
+                                  _post.mediaData = data['username'];
+
+                                  instaLoading = false; isInstaSet = true;
+                                });
+                              });
+                            }
+                          },
+                          colors: pinkBurgundyGrad,
+                        ),
+                      )
+                    ],
                   ),
 
                   SizedBox(height: 20),
@@ -158,38 +205,42 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                   GradientButton(
                     child: Center(child: Text("Yükle", style: TextStyle(fontSize: 22, color: Colors.white),)),
                     onPressed: ()  {
+                      if (!isInstaSet) {
+                        Scaffold.of(context).showSnackBar(alertSnackBar("Instagram hesabı belirlenmedi"));
+                        return;
+                      }
                       if (_formKey.currentState.validate()) {
                         _formKey.currentState.save();
 
                         setState(() { isLoading = true; });
 
-                        //From post_utils.dart
-                        getInstagramData(username).then((data) {
-                          _post.mediaUrl = data['url'];
-                          _post.mediaData = data['username'];
-                          _post.type = "NORMAL";
-                          _post.owner = UserService.currentUser.name;
-                          _post.ownerId = UserService.currentUser.id;
-                          _post.timestamp = Timestamp.now();
+                        _post.type = "NORMAL";
+                        _post.owner = UserService.currentUser.name;
+                        _post.ownerId = UserService.currentUser.id;
+                        _post.timestamp = Timestamp.now();
 
-                          //TODO: Handle uploading
-                          if (groupMode) {
-                            _groupService.createPost(_group, _post).then((post) {
-                              setState(() {
-                                isLoading = false;
-                                _post = Post();
-                              });
-                              Scaffold.of(context).showSnackBar(infoSnackBar("Puanlama başarıyla yüklendi"));
+                        //TODO: Handle uploading
+                        if (groupMode) {
+                          _groupService.createPost(_group, _post).then((post) {
+                            setState(() {
+                              isLoading = false;
+                              _post = Post();
                             });
-                          } else {
-                            _userService.createPost(_post).then((post) {
-                              setState(() {
-                                isLoading = false;
-                                _post = Post();
-                              });
-                              Scaffold.of(context).showSnackBar(infoSnackBar("Puanlama başarıyla yüklendi"));
+                            Scaffold.of(context).showSnackBar(infoSnackBar("Puanlama başarıyla yüklendi"));
+                          });
+                        } else {
+                          _userService.createPost(_post).then((post) {
+                            setState(() {
+                              isLoading = false;
+                              _post = Post();
                             });
-                          }
+                            Scaffold.of(context).showSnackBar(infoSnackBar("Puanlama başarıyla yüklendi"));
+                          });
+                        }
+
+                        setState(() {
+                          instaLoading = false;
+                          isInstaSet = false;
                         });
                       }
                     },

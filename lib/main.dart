@@ -21,7 +21,6 @@ void main() async {
   if (user == null) {
     initRoute = '/register';
   } else {
-    print(user.uid);
     UserService.currentUser = await UserService.instance.findUser(user.uid);
     if (UserService.currentUser != null)
       initRoute = '/home';

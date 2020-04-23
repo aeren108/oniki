@@ -21,6 +21,8 @@ class RequestPostPage extends StatefulWidget {
 
 class _RequestPostPageState extends State<RequestPostPage> {
   final _userService = UserService.instance;
+
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
 
   String username;
@@ -38,6 +40,7 @@ class _RequestPostPageState extends State<RequestPostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         elevation: 0.0,
         backgroundColor: watermelon,
@@ -120,7 +123,7 @@ class _RequestPostPageState extends State<RequestPostPage> {
                           _formKey.currentState.save();
 
                           if (widget.request.rejected) {
-                            Scaffold.of(context).showSnackBar(infoSnackBar("Bu istek reddedildi"));
+                            _scaffoldKey.currentState.showSnackBar(infoSnackBar("Bu istek reddedildi"));
                             return;
                           }
 
