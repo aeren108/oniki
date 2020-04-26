@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:oniki/constants.dart';
+import 'package:oniki/model/user.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
 import 'package:oniki/widgets/google_signin_button.dart';
@@ -115,13 +117,13 @@ class AuthFormState extends State<AuthForm> {
 
                   setState(() => widget.isLoading = true);
 
-                  _authService.authenticateWithGoogle(googleUser).then((user) {
+                  _authService.authenticateWithGoogle(googleUser).then((FirebaseUser user) {
                     UserService.instance.findUser(user.uid).then((usr) {
                       if (usr != null) {
                         UserService.currentUser = usr;
                         Navigator.pushReplacementNamed(context, '/home');
                       } else {
-                        UserService.instance.createUser(user.displayName, user.uid, user.photoUrl).then((usr0) {
+                        UserService.instance.createUser(user.displayName, user.uid, user.photoUrl).then((User usr0) {
 
                           UserService.currentUser = usr0;
                           Navigator.pushReplacementNamed(context, '/home');
