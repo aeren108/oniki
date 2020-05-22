@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Post {
   String id;
-  String name;
+  String name = "";
   String type;
   String mediaUrl;
   String mediaData;

@@ -18,3 +18,31 @@ Future<Map<String, dynamic>> getInstagramData(String username) async {
     };
   }
 }
+
+Future<Map<String, dynamic>> getMovieData(String movie) async {
+  List<String> words = movie.split(" ");
+  String searchText = "";
+  for (var word in words)
+    searchText += word + "+";
+
+  final response = await http.get("http://www.omdbapi.com/?apikey=ab62d015&t=$searchText");
+
+  if (response.statusCode == 200) {
+    var data = json.decode(response.body);
+
+    String found = data['Response'];
+    String title = "";
+    String poster = "";
+
+    if (found == "True") {
+      title = data['Title'];
+      poster = data['Poster'];
+    }
+
+    return {
+      'found': found,
+      'title': title,
+      'poster': poster
+    };
+  }
+}

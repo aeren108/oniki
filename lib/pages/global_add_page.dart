@@ -18,19 +18,24 @@ class GlobalAddPage extends StatefulWidget {
 
 class _GlobalAddPageState extends State<GlobalAddPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameFieldCtrl = TextEditingController(text: "");
   final _userService = UserService.instance;
   final _groupService = GroupService.instance;
+
   static const PROFILE_DEST = "Profil";
+  static const INSTA = "Instagram";
+  static const MOVIE = "Dizi/Film";
 
   Post _post = Post();
   Group _group;
-  String username;
+  String typeData;
   String uploadDest = PROFILE_DEST;
+  String type = INSTA;
 
   bool isLoading = false;
   bool groupMode = false;
-  bool isInstaSet = false;
-  bool instaLoading = false;
+  bool isTypeDataSet = false;
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -54,11 +59,11 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  instaLoading ? Container(
+                  loading ? Container(
                     width: 90,
                     height: 90,
                     child: CircularProgressIndicator()) : CircleAvatar(
-                      backgroundImage: isInstaSet ? NetworkImage(_post.mediaUrl) : NetworkImage(User.PHOTO_PLACEHOLDER),
+                      backgroundImage: isTypeDataSet ? NetworkImage(_post.mediaUrl) : NetworkImage(User.PHOTO_PLACEHOLDER),
                       radius: 45,
                   ),
 
@@ -87,10 +92,33 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                     borderSide: BorderSide(style: BorderStyle.solid),
                   ),
 
+                  OutlineButton(
+                    highlightElevation: 8.0,
+                    child: Container(
+                        height: 40,
+                        width: double.infinity,
+                        child: Row(
+                          children: <Widget>[
+                            Text("Puanlama tipi:", style: TextStyle(fontSize: 18)),
+                            SizedBox(width: 8.0),
+                            SizedBox(
+                              width: 150,
+                              child: Text(type,
+                                  style: TextStyle(fontSize: 18, color: watermelon),
+                                  overflow: TextOverflow.ellipsis
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                    onPressed: () { _showTypeBottomSheet(context);},
+                    borderSide: BorderSide(style: BorderStyle.solid),
+                  ),
+
                   SizedBox(height: 12.0),
 
                   TextFormField(
-                    initialValue: _post.name,
+                    controller: _nameFieldCtrl,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: "İsim / Başlık",
@@ -118,15 +146,15 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                             initialValue: _post.mediaData,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(),
-                              labelText: "Insta",
+                              labelText: type,
                             ),
                             validator: (username) {
                               if (username.isEmpty)
-                                return "Insta boş olamaz";
+                                return "$type boş olamaz";
                               return null;
                             },
                             onSaved: (username) {
-                              this.username = username;
+                              this.typeData = username;
                             },
                           ),
                         ),
@@ -135,23 +163,43 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                       Expanded(
                         flex: 1,
                         child: GradientButton(
-                          enabled: !instaLoading,
+                          enabled: !loading,
                           child: Icon(Icons.done, size: 36),
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
 
-                              setState(() { instaLoading = true; });
-
-                              //From post_utils.dart (getInstagramData)
-                              getInstagramData(username).then((data) {
-                                setState(() {
-                                  _post.mediaUrl = data['url'];
-                                  _post.mediaData = data['username'];
-
-                                  instaLoading = false; isInstaSet = true;
-                                });
+                              setState(() {
+                                loading = true;
                               });
+
+                              if (type == INSTA) {
+                                //From post_utils.dart (getInstagramData)
+                                getInstagramData(typeData).then((data) {
+                                  setState(() {
+                                    _post.mediaUrl = data['url'];
+                                    _post.mediaData = data['username'];
+                                    _post.type = type;
+
+                                    loading = false;
+                                    isTypeDataSet = true;
+                                  });
+                                });
+                              } else if (type == MOVIE) {
+                                getMovieData(typeData).then((data) {
+                                  setState(() {
+                                    _post.name = data['title'];
+                                    _post.mediaData = data['title'];
+                                    _post.mediaUrl = data['poster'];
+                                    _post.type = type;
+
+                                    _nameFieldCtrl.text = data['title'];
+
+                                    loading = false;
+                                    isTypeDataSet = true;
+                                  });
+                                });
+                              }
                             }
                           },
                           colors: pinkBurgundyGrad,
@@ -205,7 +253,7 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                   GradientButton(
                     child: Center(child: Text("Yükle", style: TextStyle(fontSize: 22, color: Colors.white),)),
                     onPressed: ()  {
-                      if (!isInstaSet) {
+                      if (!isTypeDataSet) {
                         Scaffold.of(context).showSnackBar(alertSnackBar("Instagram hesabı belirlenmedi"));
                         return;
                       }
@@ -239,8 +287,8 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                         }
 
                         setState(() {
-                          instaLoading = false;
-                          isInstaSet = false;
+                          loading = false;
+                          isTypeDataSet = false;
                         });
                       }
                     },
@@ -309,4 +357,59 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
       }
     );
   }
+
+  void _showTypeBottomSheet(BuildContext ctx) {
+    showModalBottomSheet(
+        context: ctx,
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0), topRight: Radius.circular(16.0)),
+        ),
+        builder: (context) {
+          return Container(
+            color: Colors.transparent,
+            height: 400,
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: 12.0),
+
+                ListTile(
+                  title: Text(INSTA, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  leading: Icon(Icons.account_circle, size: 30),
+                  onTap: () {
+                    setState(() {
+                      type = INSTA;
+                    });
+
+                    Navigator.pop(context);
+                  },
+                ),
+
+                Divider(thickness: 1.0, indent: 12.0, endIndent: 12.0),
+
+                ListTile(
+                  title: Text(MOVIE, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  leading: Icon(Icons.local_movies, size: 30),
+                  onTap: () {
+                    setState(() {
+                      type = MOVIE;
+                    });
+
+                    Navigator.pop(context);
+                  },
+                ),
+
+              ],
+            ),
+          );
+        }
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameFieldCtrl.dispose();
+    super.dispose();
+  }
+
 }
