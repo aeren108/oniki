@@ -25,7 +25,7 @@ Future<Map<String, dynamic>> getMovieData(String movie) async {
   for (var word in words)
     searchText += word + "+";
 
-  final response = await http.get("http://www.omdbapi.com/?apikey=ab62d015&t=$searchText");
+  final response = await http.get("http://www.omdbapi.com/?apikey=*******&t=$searchText");
 
   if (response.statusCode == 200) {
     var data = json.decode(response.body);
