@@ -4,6 +4,7 @@ import 'package:oniki/model/group.dart';
 import 'package:oniki/model/post.dart';
 import 'package:oniki/services/group_service.dart';
 import 'package:oniki/services/user_service.dart';
+import 'package:oniki/widgets/tile_image.dart';
 
 import '../constants.dart';
 import 'add_page.dart';
@@ -95,10 +96,7 @@ class GroupPostTile extends StatelessWidget {
     return ListTile(
       title: Text(post.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
       subtitle: Text(post.mediaData, style: TextStyle(fontSize: 15)),
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage(post.mediaUrl),
-        radius: 24,
-      ),
+      leading: TileImage(post: post, size: 48),
       trailing: Column(
         children: <Widget>[
           Text(post.rate.floor().toString(),

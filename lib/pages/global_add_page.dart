@@ -19,12 +19,11 @@ class GlobalAddPage extends StatefulWidget {
 class _GlobalAddPageState extends State<GlobalAddPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameFieldCtrl = TextEditingController(text: "");
+
   final _userService = UserService.instance;
   final _groupService = GroupService.instance;
 
   static const PROFILE_DEST = "Profil";
-  static const INSTA = "Instagram";
-  static const MOVIE = "Dizi/Film";
 
   Post _post = Post();
   Group _group;
@@ -60,11 +59,16 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   loading ? Container(
-                    width: 90,
-                    height: 90,
-                    child: CircularProgressIndicator()) : CircleAvatar(
-                      backgroundImage: isTypeDataSet ? NetworkImage(_post.mediaUrl) : NetworkImage(User.PHOTO_PLACEHOLDER),
-                      radius: 45,
+                    width: 100,
+                    height: 100,
+                    child: CircularProgressIndicator()) : type == INSTA ? CircleAvatar(
+                    backgroundImage: NetworkImage(_post.mediaUrl ?? profilePlaceholder),
+                    radius: 50,
+                  ) : Image.network(
+                    _post.mediaUrl ?? profilePlaceholder,
+                    fit: BoxFit.scaleDown,
+                    height: 120,
+                    width: 100,
                   ),
 
                   SizedBox(height: 10.0),
@@ -120,6 +124,7 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                   TextFormField(
                     controller: _nameFieldCtrl,
                     decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                       border: OutlineInputBorder(),
                       labelText: "İsim / Başlık",
 
@@ -143,8 +148,9 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                         child: Padding(
                           padding: const EdgeInsets.only(right: 8.0),
                           child: TextFormField(
-                            initialValue: _post.mediaData,
+                            initialValue: _post.type == INSTA ? _post.mediaData : _post.name,
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                               border: OutlineInputBorder(),
                               labelText: type,
                             ),
@@ -164,7 +170,7 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                         flex: 1,
                         child: GradientButton(
                           enabled: !loading,
-                          child: Icon(Icons.done, size: 36),
+                          child: Icon(Icons.done, size: 27),
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
@@ -186,10 +192,17 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                                   });
                                 });
                               } else if (type == MOVIE) {
+                                //From post_utils.dart (getMovieData)
                                 getMovieData(typeData).then((data) {
+                                  if (data['found'] != "True") {
+                                    Scaffold.of(context).showSnackBar(alertSnackBar("Dizi/Film bulunamadı"));
+                                    setState(() { loading = false; });
+                                    return;
+                                  }
+                                  
                                   setState(() {
                                     _post.name = data['title'];
-                                    _post.mediaData = data['title'];
+                                    _post.mediaData = data['year'];
                                     _post.mediaUrl = data['poster'];
                                     _post.type = type;
 
@@ -262,12 +275,10 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
 
                         setState(() { isLoading = true; });
 
-                        _post.type = "NORMAL";
                         _post.owner = UserService.currentUser.name;
                         _post.ownerId = UserService.currentUser.id;
                         _post.timestamp = Timestamp.now();
 
-                        //TODO: Handle uploading
                         if (groupMode) {
                           _groupService.createPost(_group, _post).then((post) {
                             setState(() {
@@ -294,6 +305,8 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
                     },
                     colors: pinkBurgundyGrad
                   ),
+
+                  SizedBox(height: 10)
                 ],
               ),
             ),
@@ -313,7 +326,7 @@ class _GlobalAddPageState extends State<GlobalAddPage> {
       builder: (context) {
         return Container(
           color: Colors.transparent,
-          height: 450,
+          height: 400,
           child: Column(
             children: <Widget>[
               SizedBox(height: 12.0),

@@ -28,7 +28,7 @@ class _AddPageState extends State<AddPage> {
 
   Post _post;
   Group _group;
-  String username;
+  String typeData;
 
   bool isLoading = false;
   bool editMode = false;
@@ -75,10 +75,10 @@ class _AddPageState extends State<AddPage> {
               SizedBox(height: 10),
 
               TextFormField(
-                initialValue: _post.mediaData,
+                initialValue: _post.type == MOVIE ? _post.name : _post.mediaData,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: "Insta",
+                  labelText: _post.type,
 
                 ),
                 validator: (username) {
@@ -87,7 +87,7 @@ class _AddPageState extends State<AddPage> {
                   return null;
                 },
                 onSaved: (username) {
-                  this.username = username;
+                  this.typeData = username;
                 },
               ),
 
@@ -142,32 +142,65 @@ class _AddPageState extends State<AddPage> {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
 
-                    setState(() {
-                      isLoading = true;
-                    });
+                    setState(() { isLoading = true; });
 
-                    //From post_utils.dart
-                    getInstagramData(username).then((data) {
-                      _post.mediaUrl = data['url'];
-                      _post.mediaData = data['username'];
-                      _post.type = "NORMAL";
-                      _post.owner = UserService.currentUser.name;
-                      _post.ownerId = UserService.currentUser.id;
-                      _post.timestamp = Timestamp.now();
+                    if (_post.type == MOVIE) {
+                      getMovieData(typeData).then((data) {
+                        if (data['found'] != "True") {
+                          Scaffold.of(context).showSnackBar(alertSnackBar("Dizi/film bulunamadı"));
+                          setState(() { isLoading = false; });
+                          return;
+                        }
 
-                      if (!groupMode) {
-                        if (editMode)
-                          _userService.updatePost(_post).then((arg) => Navigator.pop(context));
-                        else
-                          _userService.createPost(_post).then((arg) => Navigator.pop(context));
-                      } else {
-                        if (editMode)
-                          _groupService.updatePost(widget.group, _post).then((arg) => Navigator.pop(context));
-                        else
-                          _groupService.createPost(widget.group, _post).then((arg) => Navigator.pop(context));
-                      }
+                        _post.mediaUrl = data['poster'];
+                        _post.mediaData = data['year'];
+                        _post.owner = UserService.currentUser.name;
+                        _post.ownerId = UserService.currentUser.id;
+                        _post.timestamp = Timestamp.now();
 
-                    });
+                        if (!groupMode) {
+                          if (editMode)
+                            _userService.updatePost(_post).then((arg) =>
+                                Navigator.pop(context));
+                          else
+                            _userService.createPost(_post).then((arg) =>
+                                Navigator.pop(context));
+                        } else {
+                          if (editMode)
+                            _groupService.updatePost(widget.group, _post).then((
+                                arg) => Navigator.pop(context));
+                          else
+                            _groupService.createPost(widget.group, _post).then((
+                                arg) => Navigator.pop(context));
+                        }
+
+                      });
+                    } else {
+                      //From post_utils.dart
+                      getInstagramData(typeData).then((data) {
+                        _post.mediaUrl = data['url'];
+                        _post.mediaData = data['username'];
+                        _post.owner = UserService.currentUser.name;
+                        _post.ownerId = UserService.currentUser.id;
+                        _post.timestamp = Timestamp.now();
+
+                        if (!groupMode) {
+                          if (editMode)
+                            _userService.updatePost(_post).then((arg) =>
+                                Navigator.pop(context));
+                          else
+                            _userService.createPost(_post).then((arg) =>
+                                Navigator.pop(context));
+                        } else {
+                          if (editMode)
+                            _groupService.updatePost(widget.group, _post).then((
+                                arg) => Navigator.pop(context));
+                          else
+                            _groupService.createPost(widget.group, _post).then((
+                                arg) => Navigator.pop(context));
+                        }
+                      });
+                    }
                   }
                 },
                 colors: pinkBurgundyGrad

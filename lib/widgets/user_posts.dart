@@ -4,6 +4,7 @@ import 'package:oniki/model/post.dart';
 import 'package:oniki/model/user.dart';
 import 'package:oniki/pages/add_page.dart';
 import 'package:oniki/services/user_service.dart';
+import 'package:oniki/widgets/tile_image.dart';
 
 class UserPosts extends StatefulWidget {
   User user;
@@ -103,10 +104,7 @@ class PostTile extends StatelessWidget {
     return ListTile(
       title: Text(post.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
       subtitle: Text(post.mediaData, style: TextStyle(fontSize: 15)),
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage(post.mediaUrl),
-        radius: 24,
-      ),
+      leading: TileImage(post: post, size: 48),
       trailing: Text(post.rate.floor().toString(),
         style: TextStyle(fontSize: 32, color: watermelon, fontFamily: "Faster One")
       ),

@@ -14,6 +14,10 @@ final Color watermelon = Color(0xffED4C67);
 final Color alertColor = Color(0xffC03D29);
 final Color infoColor = Color(0xff9759e3);
 
+final MOVIE = "Dizi/Film";
+final INSTA = "Instagram";
+final profilePlaceholder = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
+
 final orangeRedGrad = <Color>[Color(0xfff7781e), Color(0xffed154b)];
 final greenBlueGrad = <Color>[Color(0xff43cea2), Color(0xff185a9d)];
 final greenLimeGrad = <Color>[Color(0xff009245), Color(0xffFCEE21)];
