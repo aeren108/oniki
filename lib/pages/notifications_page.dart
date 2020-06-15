@@ -166,9 +166,11 @@ class RequestNotificationTile extends StatelessWidget {
       ),
 
       subtitle: Text(notif.name, style: TextStyle(fontSize: 15)),
-      leading: CircleAvatar(
-        child: Image(image: NetworkImage(notif.media)),
-        radius: 28
+      leading: Image.network(
+        notif.media,
+        width: 56,
+        height: 56,
+        fit: BoxFit.cover,
       ),
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationPostPage(notif: notif)));
@@ -213,9 +215,11 @@ class ReplyNotificationTile extends StatelessWidget {
       ),
 
       subtitle: Text(notif.name, style: TextStyle(fontSize: 15)),
-      leading: CircleAvatar(
-          child: Image(image: NetworkImage(notif.media)),
-          radius: 28
+      leading: Image.network(
+        notif.media,
+        width: 56,
+        height: 56,
+        fit: BoxFit.cover,
       ),
       trailing: Text(notif.rate.floor().toString(),
         style: TextStyle(fontSize: 32, color: watermelon, fontFamily: "Faster One")

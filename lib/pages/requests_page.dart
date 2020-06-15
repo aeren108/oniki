@@ -140,9 +140,11 @@ class RequestTile extends StatelessWidget {
         ],
       ),
       subtitle: Text(request.name, style: TextStyle(fontSize: 15)),
-      leading: CircleAvatar(
-        child: Image(image: NetworkImage(request.media)),
-        radius: 28,
+      leading: Image.network(
+        request.media,
+        width: 56,
+        height: 56,
+        fit: BoxFit.cover,
       ),
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RequestPostPage(receiver: request.receiverUser, request: request))),
     );

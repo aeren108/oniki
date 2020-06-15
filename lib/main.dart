@@ -37,6 +37,7 @@ class MyApp extends StatelessWidget {
             )
           ),
 
+          debugShowCheckedModeBanner: false,
           initialRoute: snapshot.data,
           routes: <String, WidgetBuilder>{
             '/home': (context) => HomePage(),
