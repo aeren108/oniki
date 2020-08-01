@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:oniki/constants.dart';
 import 'package:oniki/model/user.dart';
 import 'package:oniki/pages/auth_form.dart';
-import 'package:oniki/pages/home_page.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
+import 'package:oniki/utils/notification_manager.dart';
 
 class RegisterPage extends AuthForm {
   static final _stateKey = GlobalKey<AuthFormState>();
@@ -112,11 +112,17 @@ class RegisterPage extends AuthForm {
     _stateKey.currentState.setState(() => isLoading = true);
 
     _authService.registerWithEmail(email, password).then((user) {
-      UserService.instance.createUser(name, user.uid);
-      User u = User.newUser(name, user.uid);
-      UserService.currentUser = u;
+      NotificationManager.instance.getToken().then((token) {
+        UserService.instance.createUser(name, user.uid, token);
 
-      Navigator.pushReplacementNamed(context, '/home');
+        User u = User.newUser(name, user.uid, token);
+        UserService.currentUser = u;
+
+        Navigator.pushReplacementNamed(context, '/home');
+      }).catchError((error) {
+        _stateKey.currentState.setState(() => isLoading = false);
+        scaffold.currentState.showSnackBar(alertSnackBar("Bir şeyler ters gitti."));
+      });
 
       _authService.currentUser.then((user) {
         UserUpdateInfo info = UserUpdateInfo();

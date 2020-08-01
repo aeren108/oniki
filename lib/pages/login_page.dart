@@ -4,6 +4,7 @@ import 'package:oniki/constants.dart';
 import 'package:oniki/pages/auth_form.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
+import 'package:oniki/utils/notification_manager.dart';
 
 class LoginPage extends AuthForm {
   static final _stateKey = GlobalKey<AuthFormState>();
@@ -93,7 +94,15 @@ class LoginPage extends AuthForm {
         UserService.instance.findUser(user.uid).then((usr) {
           UserService.currentUser = usr;
 
-          Navigator.pushReplacementNamed(context, '/home');
+          NotificationManager.instance.getToken().then((token) {
+            UserService.currentUser.token = token;
+            UserService.instance.updateUser(UserService.currentUser).then((value) {
+              Navigator.pushReplacementNamed(context, '/home');
+            });
+          }).catchError((error) {
+            _stateKey.currentState.setState(() => isLoading = false);
+            scaffold.currentState.showSnackBar(alertSnackBar("Bazı şeyler ters gitti"));
+          });
         });
     }).catchError((error) {
       _stateKey.currentState.setState(() => isLoading = false);

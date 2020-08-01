@@ -5,6 +5,7 @@ import 'package:oniki/constants.dart';
 import 'package:oniki/model/user.dart';
 import 'package:oniki/services/auth_service.dart';
 import 'package:oniki/services/user_service.dart';
+import 'package:oniki/utils/notification_manager.dart';
 import 'package:oniki/widgets/google_signin_button.dart';
 import 'package:oniki/widgets/gradient_button.dart';
 
@@ -121,12 +122,32 @@ class AuthFormState extends State<AuthForm> {
                     UserService.instance.findUser(user.uid).then((usr) {
                       if (usr != null) {
                         UserService.currentUser = usr;
-                        Navigator.pushReplacementNamed(context, '/home');
-                      } else {
-                        UserService.instance.createUser(user.displayName, user.uid, user.photoUrl).then((User usr0) {
 
-                          UserService.currentUser = usr0;
-                          Navigator.pushReplacementNamed(context, '/home');
+                        NotificationManager.instance.getToken().then((token) {
+                          UserService.currentUser.token = token;
+                          UserService.instance.updateUser(UserService.currentUser).then((value) {
+                            Navigator.pushReplacementNamed(context, '/home');
+                          });
+                        }).catchError((error) {
+                          setState(() => widget.isLoading = false);
+                        });
+
+                      } else {
+                        NotificationManager.instance.getToken().then((token) {
+                          UserService.instance.createUser(user.displayName, user.uid, user.photoUrl).then((User usr0) {
+                            UserService.currentUser = usr0;
+
+                            NotificationManager.instance.getToken().then((token) {
+                              UserService.currentUser.token = token;
+                              UserService.instance.updateUser(UserService.currentUser).then((value) {
+                                Navigator.pushReplacementNamed(context, '/home');
+                              });
+                            }).catchError((error) {
+                              setState(() => widget.isLoading = false);
+                            });
+                          });
+                        }).catchError((error) {
+                          setState(() => widget.isLoading = false);
                         });
                       }
                     }).catchError((error) {

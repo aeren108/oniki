@@ -102,7 +102,7 @@ class RequestTile extends StatelessWidget {
 
   RequestTile({ @required this.request }) {
     if (request.receiverUser == null)
-      request.receiverUser = User.newUser(request.receiverName, request.receiver);
+      request.receiverUser = User.newUser(request.receiverName, request.receiver, "");
 
     if (request.rejected)
       info = " bu isteği reddetti";

@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:oniki/constants.dart';
 import 'package:oniki/pages/add_page.dart';
 import 'package:oniki/pages/login_page.dart';
 import 'package:oniki/pages/register_page.dart';

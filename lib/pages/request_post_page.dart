@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:oniki/constants.dart';
-import 'package:oniki/model/post.dart';
 import 'package:oniki/model/request.dart';
 import 'package:oniki/model/user.dart';
 import 'package:oniki/pages/home_page.dart';

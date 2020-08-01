@@ -20,9 +20,9 @@ class UserService {
 
   UserService._();
 
-  Future<User> createUser(String name, String id, [String photoUrl]) async {
+  Future<User> createUser(String name, String id, String token, [String photoUrl]) async {
     DocumentReference doc = userRef.document(id);
-    User u = User.newUser(name, id);
+    User u = User.newUser(name, id, token);
 
     if (photoUrl != null)
       u.photo = photoUrl;
